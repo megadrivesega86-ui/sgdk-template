@@ -17,6 +17,7 @@ extern const SpriteDefinition spr_escudo;
 extern const SpriteDefinition spr_exp;
 extern const Image img_fondo;
 extern const Image img_tierra;
+extern const Image img_altura;
 extern const Image img_ptop;
 extern const Image img_pmid;
 extern const Image img_pbot;

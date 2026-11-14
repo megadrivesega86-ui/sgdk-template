@@ -260,12 +260,12 @@ int main() {
                             pwr.x = enemigos[i].x + 8; pwr.y = enemigos[i].y;
                             SPR_setVisibility(pwr.spr, VISIBLE); SPR_setPosition(pwr.spr, pwr.x, pwr.y); SPR_setFrame(pwr.spr, tipoPwr * 6 + ((timer >> 2) % 6));
                         } else { puntos += 500; }
-                    } if (faseActual == 0 && puntos >= 5000) {
+                    } if (faseActual == 0 && puntos >= 10000) {
                         faseActual = 1; avisoOrbita = 90; sfxStart();
                         PAL_setPalette(PAL0, img_fondo.palette->data, DMA);
                         PAL_setColor(15, RGB24_TO_VDPCOLOR(0xFFFFFF));
-                        VDP_drawImageEx(BG_B, &img_fondo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX), 0, 0, FALSE, TRUE);
-                        VDP_drawImageEx(BG_B, &img_fondo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX), 32, 0, FALSE, TRUE);
+                        PAL_setPalette(PAL0, img_altura.palette->data, CPU); PAL_setColor(15, RGB24_TO_VDPCOLOR(0xFFFFFF)); VDP_drawImageEx(BG_B, &img_altura, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX), 0, 0, FALSE, TRUE);
+                        VDP_drawImageEx(BG_B, &img_altura, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX), 32, 0, FALSE, TRUE);
                         VDP_setTextPalette(PAL0); VDP_drawText("ORBITA ALCANZADA!", 11, 12);
                     }
                     verHUD(); break;

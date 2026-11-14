@@ -8,6 +8,7 @@ SPRITE spr_escudo "escudo.png" 4 4 NONE 0
 SPRITE spr_exp "explosion.png" 4 4 NONE 0
 IMAGE img_fondo "fondo.png" FAST
 IMAGE img_tierra "tierra.png" FAST
+IMAGE img_altura "altura.png" FAST
 IMAGE img_ptop "p_top.png" FAST
 IMAGE img_pmid "p_mid.png" FAST
 IMAGE img_pbot "p_bot.png" FAST
