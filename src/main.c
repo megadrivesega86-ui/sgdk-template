@@ -1,7 +1,7 @@
 #include <genesis.h>
 #include "resources.h"
 
-#define MAX_BALAS 12
+#define MAX_BALAS 16
 #define MAX_ENEMIGOS 6
 #define MAX_EXP 4
 #define ID_SFX_LASER 64
@@ -11,8 +11,9 @@
 typedef struct { Sprite* spr; s16 x, y; bool activo; u16 vida; } Entidad;
 Entidad jugador, balas[MAX_BALAS], enemigos[MAX_ENEMIGOS], exps[MAX_EXP];
 u32 puntos = 0;
-u16 vidas = 3, cd = 0, timer = 0, prevM = 0, parpadeo = 0;
+u16 vidas = 3, cd = 0, timer = 0, prevM = 0;
 u8 estadoJuego = 0;
+u8 naveElegida = 0;
 bool autoFire = FALSE;
 s16 scrollY = 0;
 char hud[40];
@@ -21,42 +22,45 @@ void sfxLaser() { XGM_startPlayPCM(ID_SFX_LASER, 1, SOUND_PCM_CH2); }
 void sfxBoom()  { XGM_startPlayPCM(ID_SFX_BOOM, 10, SOUND_PCM_CH3); }
 
 void verHUD() {
-    sprintf(hud, "PUNTOS:%05lu  VIDAS:%d  %s", puntos, vidas, autoFire ? "[AUTO]" : "      ");
+    const char* nom[] = {"DREAMER", "RAVEN-X", "COLOSSUS"};
+    VDP_setTextPalette(PAL0);
+    sprintf(hud, "%-8s PTS:%05lu VIDAS:%d %s", nom[naveElegida], puntos, vidas, autoFire ? "[A]" : "   ");
     VDP_drawText(hud, 1, 1);
-}
-
-void ocultarTodo() {
-    for (int i = 0; i < MAX_BALAS; i++) { balas[i].activo = FALSE; SPR_setVisibility(balas[i].spr, HIDDEN); }
-    for (int i = 0; i < MAX_ENEMIGOS; i++) { enemigos[i].activo = FALSE; SPR_setVisibility(enemigos[i].spr, HIDDEN); }
-    for (int i = 0; i < MAX_EXP; i++) { exps[i].activo = FALSE; SPR_setVisibility(exps[i].spr, HIDDEN); }
 }
 
 void crearExp(s16 x, s16 y) {
     for (int i = 0; i < MAX_EXP; i++) {
         if (!exps[i].activo) {
             exps[i].activo = TRUE; exps[i].x = x; exps[i].y = y; exps[i].vida = 12;
-            SPR_setVisibility(exps[i].spr, VISIBLE); SPR_setPosition(exps[i].spr, x, y);
-            break;
+            SPR_setVisibility(exps[i].spr, VISIBLE); SPR_setPosition(exps[i].spr, x, y); break;
+        }
+    }
+}
+
+void lanzarBala(s16 bx, s16 by) {
+    for (int i = 0; i < MAX_BALAS; i++) {
+        if (!balas[i].activo) {
+            balas[i].activo = TRUE; balas[i].x = bx; balas[i].y = by;
+            SPR_setVisibility(balas[i].spr, VISIBLE); SPR_setPosition(balas[i].spr, bx, by); break;
         }
     }
 }
 
 void disparar() {
-    for (int i = 0; i < MAX_BALAS; i++) {
-        if (!balas[i].activo) {
-            balas[i].activo = TRUE; balas[i].x = jugador.x + 12; balas[i].y = jugador.y - 6;
-            SPR_setVisibility(balas[i].spr, VISIBLE); SPR_setPosition(balas[i].spr, balas[i].x, balas[i].y);
-            sfxLaser(); break;
-        }
+    if (naveElegida == 2) {
+        lanzarBala(jugador.x + 4, jugador.y - 4);
+        lanzarBala(jugador.x + 20, jugador.y - 4);
+    } else {
+        lanzarBala(jugador.x + 12, jugador.y - 6);
     }
+    sfxLaser();
 }
 
 void crearEnemigo() {
     for (int i = 0; i < MAX_ENEMIGOS; i++) {
         if (!enemigos[i].activo) {
             enemigos[i].activo = TRUE; enemigos[i].x = (random() % 272) + 16; enemigos[i].y = -32;
-            SPR_setVisibility(enemigos[i].spr, VISIBLE); SPR_setPosition(enemigos[i].spr, enemigos[i].x, enemigos[i].y);
-            break;
+            SPR_setVisibility(enemigos[i].spr, VISIBLE); SPR_setPosition(enemigos[i].spr, enemigos[i].x, enemigos[i].y); break;
         }
     }
 }
@@ -64,9 +68,23 @@ void crearEnemigo() {
 bool choca(s16 x1, s16 y1, s16 w1, s16 h1, s16 x2, s16 y2, s16 w2, s16 h2) {
     return (x1 < x2 + w2 && x1 + w1 > x2 && y1 < y2 + h2 && y1 + h1 > y2);
 }
+void dibujarBandas(const Image* top, const Image* mid, const Image* bot) {
+    SPR_reset();
+    VDP_setVerticalScroll(BG_B, 0);
+    PAL_setPalette(PAL0, top->palette->data, DMA);
+    PAL_setPalette(PAL2, mid->palette->data, DMA);
+    PAL_setPalette(PAL3, bot->palette->data, DMA);
+    VDP_clearPlane(BG_A, TRUE); VDP_clearPlane(BG_B, TRUE);
+    u16 idx = TILE_USER_INDEX;
+    VDP_drawImageEx(BG_B, top, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, idx), 0, 0, FALSE, TRUE);
+    idx += top->tileset->numTile;
+    VDP_drawImageEx(BG_B, mid, TILE_ATTR_FULL(PAL2, FALSE, FALSE, FALSE, idx), 0, 6, FALSE, TRUE);
+    idx += mid->tileset->numTile;
+    VDP_drawImageEx(BG_B, bot, TILE_ATTR_FULL(PAL3, FALSE, FALSE, FALSE, idx), 0, 22, FALSE, TRUE);
+}
+
 void mostrarTitulo() {
-    estadoJuego = 0; ocultarTodo();
-    SPR_setVisibility(jugador.spr, HIDDEN);
+    estadoJuego = 0; SPR_reset();
     VDP_setVerticalScroll(BG_B, 0);
     PAL_setPalette(PAL0, img_ptop.palette->data, DMA);
     PAL_setPalette(PAL2, img_pmid.palette->data, DMA);
@@ -80,54 +98,94 @@ void mostrarTitulo() {
     VDP_drawImageEx(BG_B, &img_pbot, TILE_ATTR_FULL(PAL3, FALSE, FALSE, FALSE, idx), 0, 23, FALSE, TRUE);
 }
 
-void empezarPartida() {
-    puntos = 0; vidas = 3; estadoJuego = 1; ocultarTodo();
-    PAL_setPalette(PAL0, img_fondo.palette->data, DMA);
-    PAL_setPalette(PAL2, spr_enemigo.palette->data, DMA);
-    VDP_clearPlane(BG_A, TRUE); VDP_clearPlane(BG_B, TRUE);
-    VDP_drawImageEx(BG_B, &img_fondo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX), 0, 0, FALSE, TRUE);
-    VDP_drawImageEx(BG_B, &img_fondo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX), 32, 0, FALSE, TRUE);
-    jugador.x = 144; jugador.y = 170;
-    SPR_setVisibility(jugador.spr, VISIBLE);
-    verHUD();
+void mostrarSeleccion() {
+    estadoJuego = 1;
+    if (naveElegida == 0) dibujarBandas(&img_s1_top, &img_s1_mid, &img_s1_bot);
+    else if (naveElegida == 1) dibujarBandas(&img_s2_top, &img_s2_mid, &img_s2_bot);
+    else dibujarBandas(&img_s3_top, &img_s3_mid, &img_s3_bot);
+    PAL_setColor(63, RGB24_TO_VDPCOLOR(0xFFFFFF));
+    VDP_setTextPalette(PAL3);
+    if (naveElegida == 0) {
+        VDP_drawText("SPD: ===--  VIDAS: 3", 9, 23);
+        VDP_drawText("ARMA: LASER CENTRAL ", 9, 24);
+    } else if (naveElegida == 1) {
+        VDP_drawText("SPD: =====  VIDAS: 2", 9, 23);
+        VDP_drawText("ARMA: DISPARO RAPIDO", 9, 24);
+    } else {
+        VDP_drawText("SPD: ==---  VIDAS: 5", 9, 23);
+        VDP_drawText("ARMA: DOBLE PARALELO", 9, 24);
+    }
+    VDP_drawText("< IZQ/DER >  START:JUGAR", 9, 26);
 }
 
+void empezarPartida() {
+    puntos = 0; estadoJuego = 2;
+    vidas = (naveElegida == 1) ? 2 : ((naveElegida == 2) ? 5 : 3);
+    SPR_reset();
+    VDP_clearPlane(BG_A, TRUE); VDP_clearPlane(BG_B, TRUE);
+    PAL_setPalette(PAL0, img_fondo.palette->data, DMA);
+    PAL_setColor(15, RGB24_TO_VDPCOLOR(0xFFFFFF));
+    PAL_setPalette(PAL2, spr_enemigo.palette->data, DMA);
+    PAL_setPalette(PAL3, spr_exp.palette->data, DMA);
+    VDP_drawImageEx(BG_B, &img_fondo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX), 0, 0, FALSE, TRUE);
+    VDP_drawImageEx(BG_B, &img_fondo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX), 32, 0, FALSE, TRUE);
+
+    const SpriteDefinition* defNave = (naveElegida == 1) ? &spr_nave_r : ((naveElegida == 2) ? &spr_nave_a : &spr_nave);
+    PAL_setPalette(PAL1, defNave->palette->data, DMA);
+    jugador.x = 144; jugador.y = 170;
+    jugador.spr = SPR_addSprite(defNave, jugador.x, jugador.y, TILE_ATTR(PAL1, 0, FALSE, FALSE));
+
+    for (int i = 0; i < MAX_BALAS; i++) { balas[i].activo = FALSE; balas[i].spr = SPR_addSprite(&spr_laser, 0, 0, TILE_ATTR(PAL3, 0, FALSE, FALSE)); SPR_setVisibility(balas[i].spr, HIDDEN); }
+    for (int i = 0; i < MAX_ENEMIGOS; i++) { enemigos[i].activo = FALSE; enemigos[i].spr = SPR_addSprite(&spr_enemigo, 0, 0, TILE_ATTR(PAL2, 0, FALSE, FALSE)); SPR_setVisibility(enemigos[i].spr, HIDDEN); }
+    for (int i = 0; i < MAX_EXP; i++) { exps[i].activo = FALSE; exps[i].spr = SPR_addSprite(&spr_exp, 0, 0, TILE_ATTR(PAL3, 0, FALSE, FALSE)); SPR_setVisibility(exps[i].spr, HIDDEN); }
+    verHUD();
+}
 int main() {
     JOY_init(); SPR_init();
     XGM_setPCM(ID_SFX_LASER, sfx_laser, sizeof(sfx_laser));
     XGM_setPCM(ID_SFX_BOOM, sfx_boom, sizeof(sfx_boom));
     XGM_setPCM(ID_BGM_TEMA, bgm_tema, sizeof(bgm_tema));
-
-    PAL_setPalette(PAL1, spr_nave.palette->data, DMA);
     VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
-
-    jugador.spr = SPR_addSprite(&spr_nave, 144, 114, TILE_ATTR(PAL1, 0, FALSE, FALSE));
-    for (int i = 0; i < MAX_BALAS; i++) { balas[i].spr = SPR_addSprite(&spr_laser, 0, 0, TILE_ATTR(PAL1, 0, FALSE, FALSE)); SPR_setVisibility(balas[i].spr, HIDDEN); }
-    for (int i = 0; i < MAX_ENEMIGOS; i++) { enemigos[i].spr = SPR_addSprite(&spr_enemigo, 0, 0, TILE_ATTR(PAL2, 0, FALSE, FALSE)); SPR_setVisibility(enemigos[i].spr, HIDDEN); }
-    for (int i = 0; i < MAX_EXP; i++) { exps[i].spr = SPR_addSprite(&spr_exp, 0, 0, TILE_ATTR(PAL1, 0, FALSE, FALSE)); SPR_setVisibility(exps[i].spr, HIDDEN); }
     mostrarTitulo();
 
     while(1) {
         if (!XGM_isPlayingPCM(SOUND_PCM_CH1_MSK)) { XGM_startPlayPCM(ID_BGM_TEMA, 0, SOUND_PCM_CH1); }
         u16 m = JOY_readJoypad(JOY_1);
         if (estadoJuego == 0) {
-            if ((m & BUTTON_START) && !(prevM & BUTTON_START)) { empezarPartida(); }
+            if (++timer >= 50) { timer = 0; }
+            if (timer == 1) { PAL_setPalette(PAL3, img_pbot.palette->data, DMA); }
+            else if (timer == 26) {
+                for (u16 k = 1; k < 16; k++) {
+                    u16 col = img_pbot.palette->data[k];
+                    u16 r = col & 0x000E; u16 b = (col >> 8) & 0x000E;
+                    if (r >= b) { PAL_setColor(48 + k, RGB24_TO_VDPCOLOR(0x040818)); }
+                }
+            }
+            if ((m & BUTTON_START) && !(prevM & BUTTON_START)) { timer = 0; sfxLaser(); mostrarSeleccion(); }
             prevM = m; SPR_update(); SYS_doVBlankProcess(); continue;
         }
-        if (estadoJuego == 2) {
+        if (estadoJuego == 1) {
+            if ((m & BUTTON_LEFT) && !(prevM & BUTTON_LEFT)) { naveElegida = (naveElegida == 0) ? 2 : naveElegida - 1; sfxLaser(); mostrarSeleccion(); }
+            if ((m & BUTTON_RIGHT) && !(prevM & BUTTON_RIGHT)) { naveElegida = (naveElegida + 1) % 3; sfxLaser(); mostrarSeleccion(); }
+            if ((m & (BUTTON_START | BUTTON_A | BUTTON_C)) && !(prevM & (BUTTON_START | BUTTON_A | BUTTON_C))) { sfxLaser(); empezarPartida(); }
+            prevM = m; SPR_update(); SYS_doVBlankProcess(); continue;
+        }
+        if (estadoJuego == 3) {
             if ((m & BUTTON_START) && !(prevM & BUTTON_START)) { mostrarTitulo(); }
             prevM = m; SPR_update(); SYS_doVBlankProcess(); continue;
         }
         scrollY -= 2; VDP_setVerticalScroll(BG_B, scrollY);
-        if (m & BUTTON_LEFT) { jugador.x -= 3; } if (m & BUTTON_RIGHT) { jugador.x += 3; }
-        if (m & BUTTON_UP) { jugador.y -= 3; } if (m & BUTTON_DOWN) { jugador.y += 3; }
+        s16 vel = (naveElegida == 1) ? 5 : ((naveElegida == 2) ? 2 : 3);
+        u16 recarga = (naveElegida == 1) ? 4 : ((naveElegida == 2) ? 10 : 7);
+        if (m & BUTTON_LEFT) { jugador.x -= vel; } if (m & BUTTON_RIGHT) { jugador.x += vel; }
+        if (m & BUTTON_UP) { jugador.y -= vel; } if (m & BUTTON_DOWN) { jugador.y += vel; }
         if (jugador.x < 8) { jugador.x = 8; } if (jugador.x > 280) { jugador.x = 280; }
         if (jugador.y < 24) { jugador.y = 24; } if (jugador.y > 184) { jugador.y = 184; }
         SPR_setPosition(jugador.spr, jugador.x, jugador.y);
         if ((m & BUTTON_B) && !(prevM & BUTTON_B)) { autoFire = !autoFire; verHUD(); }
         prevM = m;
         if (cd > 0) { cd--; }
-        if (((m & (BUTTON_A | BUTTON_C)) || autoFire) && cd == 0) { disparar(); cd = 7; }
+        if (((m & (BUTTON_A | BUTTON_C)) || autoFire) && cd == 0) { disparar(); cd = recarga; }
         for (int i = 0; i < MAX_BALAS; i++) if (balas[i].activo) {
             balas[i].y -= 6;
             if (balas[i].y < -8) { balas[i].activo = FALSE; SPR_setVisibility(balas[i].spr, HIDDEN); }
@@ -152,7 +210,8 @@ int main() {
                     crearExp(enemigos[i].x, enemigos[i].y); sfxBoom();
                     if (vidas > 0) { vidas--; } verHUD();
                     if (vidas == 0) {
-                        estadoJuego = 2; SPR_setVisibility(jugador.spr, HIDDEN); crearExp(jugador.x, jugador.y);
+                        estadoJuego = 3; SPR_setVisibility(jugador.spr, HIDDEN); crearExp(jugador.x, jugador.y);
+                        VDP_setTextPalette(PAL0);
                         VDP_drawText("G A M E   O V E R", 11, 12); VDP_drawText("PULSA STAR", 15, 14);
                     }
                 }
