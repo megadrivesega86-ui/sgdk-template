@@ -10,7 +10,12 @@
 #define ID_SFX_START 67
 #define ID_BGM_SEL   68
 
-typedef struct { Sprite* spr; s16 x, y; bool activo; u16 vida; } Entidad;
+typedef struct { Sprite* spr; s16 x, y, vx; bool activo; u16 vida; } Entidad;
+Entidad pwr;
+u8 nivelArma = 1, bajasPwr = 0, tipoPwr = 0, faseActual = 0;
+u16 avisoOrbita = 0, despegue = 0;
+u8 escudo = 0;
+Sprite* sprEscudo;
 Entidad jugador, balas[MAX_BALAS], enemigos[MAX_ENEMIGOS], exps[MAX_EXP];
 u32 puntos = 0;
 u16 vidas = 3, cd = 0, timer = 0, prevM = 0;
@@ -27,7 +32,7 @@ void sfxStart() { XGM_startPlayPCM(ID_SFX_START, 15, SOUND_PCM_CH4); }
 void verHUD() {
     const char* nom[] = {"DREAMER", "RAVEN-X", "COLOSSUS"};
     VDP_setTextPalette(PAL0);
-    sprintf(hud, "%-8s PTS:%05lu VIDAS:%d %s", nom[naveElegida], puntos, vidas, autoFire ? "[A]" : "   ");
+    sprintf(hud, "%-8s %05lu V:%d %s%s", nom[naveElegida], puntos, vidas, (escudo == 3) ? "[S3]" : ((escudo == 2) ? "[S2]" : ((escudo == 1) ? "[S1]" : "    ")), (nivelArma > 1) ? "[W]" : (autoFire ? "[A]" : "   "));
     VDP_drawText(hud, 1, 1);
 }
 
@@ -40,10 +45,10 @@ void crearExp(s16 x, s16 y) {
     }
 }
 
-void lanzarBala(s16 bx, s16 by) {
+void lanzarBala(s16 bx, s16 by, s16 bvx) {
     for (int i = 0; i < MAX_BALAS; i++) {
         if (!balas[i].activo) {
-            balas[i].activo = TRUE; balas[i].x = bx; balas[i].y = by;
+            balas[i].activo = TRUE; balas[i].x = bx; balas[i].y = by; balas[i].vx = bvx;
             SPR_setVisibility(balas[i].spr, VISIBLE); SPR_setPosition(balas[i].spr, bx, by); break;
         }
     }
@@ -51,10 +56,14 @@ void lanzarBala(s16 bx, s16 by) {
 
 void disparar() {
     if (naveElegida == 2) {
-        lanzarBala(jugador.x + 4, jugador.y - 4);
-        lanzarBala(jugador.x + 20, jugador.y - 4);
+        lanzarBala(jugador.x + 4, jugador.y - 4, 0);
+        lanzarBala(jugador.x + 20, jugador.y - 4, 0);
     } else {
-        lanzarBala(jugador.x + 12, jugador.y - 6);
+        lanzarBala(jugador.x + 12, jugador.y - 6, 0);
+    }
+    if (nivelArma >= 2) {
+        lanzarBala(jugador.x + 2, jugador.y, -2);
+        lanzarBala(jugador.x + 22, jugador.y, 2);
     }
     sfxLaser();
 }
@@ -122,25 +131,29 @@ void mostrarSeleccion() {
 }
 
 void empezarPartida() {
-    puntos = 0; estadoJuego = 2;
+    puntos = 0; estadoJuego = 2; nivelArma = 1; bajasPwr = 0; escudo = 0;
     vidas = (naveElegida == 1) ? 2 : ((naveElegida == 2) ? 5 : 3);
     SPR_reset();
     VDP_clearPlane(BG_A, TRUE); VDP_clearPlane(BG_B, TRUE);
-    PAL_setPalette(PAL0, img_fondo.palette->data, DMA);
+    faseActual = 0; avisoOrbita = 0;
+    PAL_setPalette(PAL0, img_tierra.palette->data, DMA);
     PAL_setColor(15, RGB24_TO_VDPCOLOR(0xFFFFFF));
     PAL_setPalette(PAL2, spr_enemigo.palette->data, DMA);
-    PAL_setPalette(PAL3, spr_exp.palette->data, DMA);
-    VDP_drawImageEx(BG_B, &img_fondo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX), 0, 0, FALSE, TRUE);
-    VDP_drawImageEx(BG_B, &img_fondo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX), 32, 0, FALSE, TRUE);
+    PAL_setPalette(PAL3, spr_pwr.palette->data, DMA);
+    VDP_drawImageEx(BG_B, &img_tierra, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX), 0, 0, FALSE, TRUE);
+    VDP_drawImageEx(BG_B, &img_tierra, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX), 32, 0, FALSE, TRUE);
 
     const SpriteDefinition* defNave = (naveElegida == 1) ? &spr_nave_r : ((naveElegida == 2) ? &spr_nave_a : &spr_nave);
     PAL_setPalette(PAL1, defNave->palette->data, DMA);
-    jugador.x = 144; jugador.y = 170;
+    jugador.x = 144; jugador.y = 216; despegue = 300;
+    VDP_setTextPalette(PAL0); VDP_drawText("DESPEGANDO...", 13, 12);
     jugador.spr = SPR_addSprite(defNave, jugador.x, jugador.y, TILE_ATTR(PAL1, 0, FALSE, FALSE));
 
     for (int i = 0; i < MAX_BALAS; i++) { balas[i].activo = FALSE; balas[i].spr = SPR_addSprite(&spr_laser, 0, 0, TILE_ATTR(PAL3, 0, FALSE, FALSE)); SPR_setVisibility(balas[i].spr, HIDDEN); }
     for (int i = 0; i < MAX_ENEMIGOS; i++) { enemigos[i].activo = FALSE; enemigos[i].spr = SPR_addSprite(&spr_enemigo, 0, 0, TILE_ATTR(PAL2, 0, FALSE, FALSE)); SPR_setVisibility(enemigos[i].spr, HIDDEN); }
     for (int i = 0; i < MAX_EXP; i++) { exps[i].activo = FALSE; exps[i].spr = SPR_addSprite(&spr_exp, 0, 0, TILE_ATTR(PAL3, 0, FALSE, FALSE)); SPR_setVisibility(exps[i].spr, HIDDEN); }
+    pwr.activo = FALSE; pwr.spr = SPR_addSprite(&spr_pwr, 0, 0, TILE_ATTR(PAL3, 0, FALSE, FALSE)); SPR_setVisibility(pwr.spr, HIDDEN);
+    sprEscudo = SPR_addSprite(&spr_escudo, jugador.x, jugador.y, TILE_ATTR(PAL3, 0, FALSE, FALSE)); SPR_setVisibility(sprEscudo, HIDDEN);
     verHUD();
 }
 int main() {
@@ -180,7 +193,18 @@ int main() {
     XGM_startPlay(mus_titulo); }
             prevM = m; SPR_update(); SYS_doVBlankProcess(); continue;
         }
-        scrollY -= 2; VDP_setVerticalScroll(BG_B, scrollY);
+        if (despegue > 0) {
+            despegue--;
+            s16 velScroll = (despegue > 200) ? 1 : ((despegue > 100) ? 2 : 3);
+            scrollY -= velScroll;
+            VDP_setVerticalScroll(BG_B, scrollY);
+            if (jugador.y > 170 && (despegue % 4 == 0)) { jugador.y--; }
+            SPR_setPosition(jugador.spr, jugador.x, jugador.y);
+            if (despegue == 0) { VDP_clearText(13, 12, 14); }
+            prevM = m; SPR_update(); SYS_doVBlankProcess(); continue;
+        }
+        scrollY -= 3; VDP_setVerticalScroll(BG_B, scrollY);
+        if (avisoOrbita > 0 && --avisoOrbita == 0) { VDP_clearText(11, 12, 18); }
         s16 vel = (naveElegida == 1) ? 5 : ((naveElegida == 2) ? 2 : 3);
         u16 recarga = (naveElegida == 1) ? 4 : ((naveElegida == 2) ? 10 : 7);
         if (m & BUTTON_LEFT) { jugador.x -= vel; } if (m & BUTTON_RIGHT) { jugador.x += vel; }
@@ -188,17 +212,32 @@ int main() {
         if (jugador.x < 8) { jugador.x = 8; } if (jugador.x > 280) { jugador.x = 280; }
         if (jugador.y < 24) { jugador.y = 24; } if (jugador.y > 184) { jugador.y = 184; }
         SPR_setPosition(jugador.spr, jugador.x, jugador.y);
+        if (escudo > 0) { SPR_setPosition(sprEscudo, jugador.x, jugador.y); SPR_setVisibility(sprEscudo, (escudo == 1 && (timer & 2)) ? HIDDEN : VISIBLE); } else { SPR_setVisibility(sprEscudo, HIDDEN); }
         if ((m & BUTTON_B) && !(prevM & BUTTON_B)) { autoFire = !autoFire; verHUD(); }
         prevM = m;
         if (cd > 0) { cd--; }
         if (((m & (BUTTON_A | BUTTON_C)) || autoFire) && cd == 0) { disparar(); cd = recarga; }
         for (int i = 0; i < MAX_BALAS; i++) if (balas[i].activo) {
-            balas[i].y -= 6;
-            if (balas[i].y < -8) { balas[i].activo = FALSE; SPR_setVisibility(balas[i].spr, HIDDEN); }
+            balas[i].y -= 6; balas[i].x += balas[i].vx;
+            if (balas[i].y < -8 || balas[i].x < -8 || balas[i].x > 328) { balas[i].activo = FALSE; SPR_setVisibility(balas[i].spr, HIDDEN); }
             else SPR_setPosition(balas[i].spr, balas[i].x, balas[i].y);
         }
         for (int i = 0; i < MAX_EXP; i++) if (exps[i].activo) {
             if (--exps[i].vida == 0) { exps[i].activo = FALSE; SPR_setVisibility(exps[i].spr, HIDDEN); }
+        }
+        if (pwr.activo) {
+            pwr.y += 2;
+            if (pwr.y > 224) { pwr.activo = FALSE; SPR_setVisibility(pwr.spr, HIDDEN); }
+            else {
+                SPR_setPosition(pwr.spr, pwr.x, pwr.y); SPR_setFrame(pwr.spr, tipoPwr * 6 + ((timer >> 2) % 6));
+                if (choca(jugador.x, jugador.y, 32, 32, pwr.x, pwr.y, 24, 24)) {
+                    pwr.activo = FALSE; SPR_setVisibility(pwr.spr, HIDDEN); sfxStart();
+                    if (tipoPwr == 0) { if (nivelArma == 1) nivelArma = 2; else puntos += 300; }
+                    else if (tipoPwr == 1) { if (escudo < 3) escudo = 3; else puntos += 300; }
+                    else { if (vidas < 10) vidas++; puntos += 500; }
+                    verHUD();
+                }
+            }
         }
         if (++timer >= 42) { crearEnemigo(); timer = 0; }
         for (int i = 0; i < MAX_ENEMIGOS; i++) if (enemigos[i].activo) {
@@ -209,12 +248,32 @@ int main() {
                 for (int b = 0; b < MAX_BALAS; b++) if (balas[b].activo && choca(balas[b].x, balas[b].y, 8, 8, enemigos[i].x+2, enemigos[i].y+2, 28, 28)) {
                     balas[b].activo = FALSE; SPR_setVisibility(balas[b].spr, HIDDEN);
                     enemigos[i].activo = FALSE; SPR_setVisibility(enemigos[i].spr, HIDDEN);
-                    crearExp(enemigos[i].x, enemigos[i].y); sfxBoom(); puntos += 100; verHUD(); break;
+                    crearExp(enemigos[i].x, enemigos[i].y); sfxBoom(); puntos += 100; if (++bajasPwr >= 4 && !pwr.activo) {
+                        bajasPwr = 0;
+                        u8 disp[3], nd = 0;
+                        if (nivelArma < 2) disp[nd++] = 0;
+                        if (escudo == 0) disp[nd++] = 1;
+                        if (vidas < 10) disp[nd++] = 2;
+                        if (nd > 0) {
+                            tipoPwr = disp[random() % nd];
+                            pwr.activo = TRUE; SPR_setFrame(pwr.spr, tipoPwr * 6);
+                            pwr.x = enemigos[i].x + 8; pwr.y = enemigos[i].y;
+                            SPR_setVisibility(pwr.spr, VISIBLE); SPR_setPosition(pwr.spr, pwr.x, pwr.y); SPR_setFrame(pwr.spr, tipoPwr * 6 + ((timer >> 2) % 6));
+                        } else { puntos += 500; }
+                    } if (faseActual == 0 && puntos >= 5000) {
+                        faseActual = 1; avisoOrbita = 90; sfxStart();
+                        PAL_setPalette(PAL0, img_fondo.palette->data, DMA);
+                        PAL_setColor(15, RGB24_TO_VDPCOLOR(0xFFFFFF));
+                        VDP_drawImageEx(BG_B, &img_fondo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX), 0, 0, FALSE, TRUE);
+                        VDP_drawImageEx(BG_B, &img_fondo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX), 32, 0, FALSE, TRUE);
+                        VDP_setTextPalette(PAL0); VDP_drawText("ORBITA ALCANZADA!", 11, 12);
+                    }
+                    verHUD(); break;
                 }
                 if (enemigos[i].activo && choca(jugador.x+4, jugador.y+4, 24, 24, enemigos[i].x+4, enemigos[i].y+4, 24, 24)) {
                     enemigos[i].activo = FALSE; SPR_setVisibility(enemigos[i].spr, HIDDEN);
                     crearExp(enemigos[i].x, enemigos[i].y); sfxBoom();
-                    if (vidas > 0) { vidas--; } verHUD();
+                    if (escudo > 0) { escudo--; if (escudo == 0) SPR_setVisibility(sprEscudo, HIDDEN); } else { nivelArma = 1; if (vidas > 0) { vidas--; } } verHUD();
                     if (vidas == 0) {
                         estadoJuego = 3; SPR_setVisibility(jugador.spr, HIDDEN); crearExp(jugador.x, jugador.y);
                         VDP_setTextPalette(PAL0);
