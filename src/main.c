@@ -68,8 +68,9 @@ void disparar() {
     sfxLaser();
 }
 
+extern u8 jefeAct, jefeMuriendo;
 void crearEnemigo() {
-    for (int i = 0; i < MAX_ENEMIGOS; i++) {
+    if (!jefeAct && !jefeMuriendo) for (int i = 0; i < MAX_ENEMIGOS; i++) {
         if (!enemigos[i].activo) {
             enemigos[i].activo = TRUE; enemigos[i].x = (random() % 272) + 16; enemigos[i].y = -32;
             SPR_setVisibility(enemigos[i].spr, VISIBLE); SPR_setPosition(enemigos[i].spr, enemigos[i].x, enemigos[i].y); break;
@@ -130,7 +131,8 @@ void mostrarSeleccion() {
     VDP_drawText("< IZQ/DER >  START:JUGAR", 9, 26);
 }
 
-void empezarPartida() {
+#include "jefe_10k.h"
+void empezarPartida() { resetJefe10k();
     puntos = 0; estadoJuego = 2; nivelArma = 1; bajasPwr = 0; escudo = 0;
     vidas = (naveElegida == 1) ? 2 : ((naveElegida == 2) ? 5 : 3);
     SPR_reset();
@@ -150,7 +152,7 @@ void empezarPartida() {
     jugador.spr = SPR_addSprite(defNave, jugador.x, jugador.y, TILE_ATTR(PAL1, 0, FALSE, FALSE));
 
     for (int i = 0; i < MAX_BALAS; i++) { balas[i].activo = FALSE; balas[i].spr = SPR_addSprite(&spr_laser, 0, 0, TILE_ATTR(PAL3, 0, FALSE, FALSE)); SPR_setVisibility(balas[i].spr, HIDDEN); }
-    for (int i = 0; i < MAX_ENEMIGOS; i++) { enemigos[i].activo = FALSE; enemigos[i].spr = SPR_addSprite(&spr_enemigo, 0, 0, TILE_ATTR(PAL2, 0, FALSE, FALSE)); SPR_setVisibility(enemigos[i].spr, HIDDEN); }
+    if (!jefeAct && !jefeMuriendo) for (int i = 0; i < MAX_ENEMIGOS; i++) { enemigos[i].activo = FALSE; enemigos[i].spr = SPR_addSprite(&spr_enemigo, 0, 0, TILE_ATTR(PAL2, 0, FALSE, FALSE)); SPR_setVisibility(enemigos[i].spr, HIDDEN); }
     for (int i = 0; i < MAX_EXP; i++) { exps[i].activo = FALSE; exps[i].spr = SPR_addSprite(&spr_exp, 0, 0, TILE_ATTR(PAL3, 0, FALSE, FALSE)); SPR_setVisibility(exps[i].spr, HIDDEN); }
     pwr.activo = FALSE; pwr.spr = SPR_addSprite(&spr_pwr, 0, 0, TILE_ATTR(PAL3, 0, FALSE, FALSE)); SPR_setVisibility(pwr.spr, HIDDEN);
     sprEscudo = SPR_addSprite(&spr_escudo, jugador.x, jugador.y, TILE_ATTR(PAL3, 0, FALSE, FALSE)); SPR_setVisibility(sprEscudo, HIDDEN);
@@ -180,7 +182,7 @@ int main() {
                 }
             }
             if ((m & BUTTON_START) && !(prevM & BUTTON_START)) { timer = 0; sfxStart();  XGM_startPlay(mus_hangar); mostrarSeleccion(); }
-            prevM = m; SPR_update(); SYS_doVBlankProcess(); continue;
+        SPR_update(); SYS_doVBlankProcess(); continue;
         }
         if (estadoJuego == 1) {
             if ((m & BUTTON_LEFT) && !(prevM & BUTTON_LEFT)) { naveElegida = (naveElegida == 0) ? 2 : naveElegida - 1; sfxLaser(); mostrarSeleccion(); }
@@ -240,7 +242,7 @@ int main() {
             }
         }
         if (++timer >= 42) { crearEnemigo(); timer = 0; }
-        for (int i = 0; i < MAX_ENEMIGOS; i++) if (enemigos[i].activo) {
+        if (!jefeAct && !jefeMuriendo) for (int i = 0; i < MAX_ENEMIGOS; i++) if (enemigos[i].activo) {
             enemigos[i].y += 2;
             if (enemigos[i].y > 224) { enemigos[i].activo = FALSE; SPR_setVisibility(enemigos[i].spr, HIDDEN); }
             else {
@@ -277,6 +279,7 @@ int main() {
                 }
             }
         }
+        if (estadoJuego == 2) cicloJefe10k(jugador.x, jugador.y);
         SPR_update(); SYS_doVBlankProcess();
     }
     return 0;
