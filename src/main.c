@@ -1,9 +1,10 @@
 #include <genesis.h>
-#include "base/game.h"
-#include "scene_creator.h"
 
-int main(bool hardReset)
-{
-    Game_loadScene(SceneCreator_create(SPLASH_SCENE));
-    return Game_run(hardReset);
+int main() {
+    VDP_drawText("Mi nuevo juego!", 10, 12);
+
+    while(1) {
+        SYS_doVBlankProcess();
+    }
+    return 0;
 }
