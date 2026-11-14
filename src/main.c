@@ -262,11 +262,10 @@ int main() {
                         } else { puntos += 500; }
                     } if (faseActual == 0 && puntos >= 10000) {
                         faseActual = 1; avisoOrbita = 90; sfxStart();
-                        PAL_setPalette(PAL0, img_fondo.palette->data, DMA);
-                        PAL_setColor(15, RGB24_TO_VDPCOLOR(0xFFFFFF));
-                        PAL_setPalette(PAL0, img_altura.palette->data, CPU); PAL_setColor(15, RGB24_TO_VDPCOLOR(0xFFFFFF)); VDP_drawImageEx(BG_B, &img_altura, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX), 0, 0, FALSE, TRUE);
-                        VDP_drawImageEx(BG_B, &img_altura, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX), 32, 0, FALSE, TRUE);
-                        VDP_setTextPalette(PAL0); VDP_drawText("ORBITA ALCANZADA!", 11, 12);
+                        VDP_setTextPalette(PAL0);
+                        VDP_drawText("MISION CUMPLIDA!", 12, 11);
+                        VDP_drawText("  PULSA START   ", 12, 13);
+                        estadoJuego = 3;
                     }
                     verHUD(); break;
                 }
