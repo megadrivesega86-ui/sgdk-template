@@ -263,9 +263,6 @@ int main() {
                     } if (faseActual == 0 && puntos >= 10000) {
                         faseActual = 1; avisoOrbita = 90; sfxStart();
                         VDP_setTextPalette(PAL0);
-                        VDP_drawText("MISION CUMPLIDA!", 12, 11);
-                        VDP_drawText("  PULSA START   ", 12, 13);
-                        estadoJuego = 3;
                     }
                     verHUD(); break;
                 }
@@ -274,7 +271,6 @@ int main() {
                     crearExp(enemigos[i].x, enemigos[i].y); sfxBoom();
                     if (escudo > 0) { escudo--; if (escudo == 0) SPR_setVisibility(sprEscudo, HIDDEN); } else { nivelArma = 1; if (vidas > 0) { vidas--; } } verHUD();
                     if (vidas == 0) {
-                        estadoJuego = 3; SPR_setVisibility(jugador.spr, HIDDEN); crearExp(jugador.x, jugador.y);
                         VDP_setTextPalette(PAL0);
                         VDP_drawText("G A M E   O V E R", 11, 12); VDP_drawText("PULSA STAR", 15, 14);
                     }

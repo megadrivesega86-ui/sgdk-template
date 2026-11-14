@@ -30,5 +30,6 @@ extern const Image img_s2_bot;
 extern const Image img_s3_top;
 extern const Image img_s3_mid;
 extern const Image img_s3_bot;
+extern const SpriteDefinition spr_jefe1;
 
 #endif // _RES_RESOURCES_H_
