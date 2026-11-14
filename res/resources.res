@@ -19,4 +19,7 @@ IMAGE img_s3_mid "s3_mid.png" FAST
 IMAGE img_s3_bot "s3_bot.png" FAST
 WAV sfx_laser "laser.wav" XGM
 WAV sfx_boom "boom.wav" XGM
-WAV bgm_tema "bgm.wav" XGM
+WAV sfx_start "start.wav" XGM
+XGM mus_titulo "mus_titulo.vgm"
+XGM mus_hangar "mus_hangar.vgm"
+XGM mus_juego "mus_juego.vgm"

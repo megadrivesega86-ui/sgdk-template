@@ -7,6 +7,8 @@
 #define ID_SFX_LASER 64
 #define ID_SFX_BOOM  65
 #define ID_BGM_TEMA  66
+#define ID_SFX_START 67
+#define ID_BGM_SEL   68
 
 typedef struct { Sprite* spr; s16 x, y; bool activo; u16 vida; } Entidad;
 Entidad jugador, balas[MAX_BALAS], enemigos[MAX_ENEMIGOS], exps[MAX_EXP];
@@ -18,8 +20,9 @@ bool autoFire = FALSE;
 s16 scrollY = 0;
 char hud[40];
 
-void sfxLaser() { XGM_startPlayPCM(ID_SFX_LASER, 1, SOUND_PCM_CH2); }
-void sfxBoom()  { XGM_startPlayPCM(ID_SFX_BOOM, 10, SOUND_PCM_CH3); }
+void sfxLaser() { XGM_startPlayPCM(ID_SFX_LASER, 10, SOUND_PCM_CH2); }
+void sfxBoom()  { XGM_startPlayPCM(ID_SFX_BOOM, 14, SOUND_PCM_CH3); }
+void sfxStart() { XGM_startPlayPCM(ID_SFX_START, 15, SOUND_PCM_CH4); }
 
 void verHUD() {
     const char* nom[] = {"DREAMER", "RAVEN-X", "COLOSSUS"};
@@ -144,12 +147,14 @@ int main() {
     JOY_init(); SPR_init();
     XGM_setPCM(ID_SFX_LASER, sfx_laser, sizeof(sfx_laser));
     XGM_setPCM(ID_SFX_BOOM, sfx_boom, sizeof(sfx_boom));
-    XGM_setPCM(ID_BGM_TEMA, bgm_tema, sizeof(bgm_tema));
+    
+    XGM_setPCM(ID_SFX_START, sfx_start, sizeof(sfx_start));
+    
     VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
     mostrarTitulo();
+    XGM_startPlay(mus_titulo);
 
     while(1) {
-        if (!XGM_isPlayingPCM(SOUND_PCM_CH1_MSK)) { XGM_startPlayPCM(ID_BGM_TEMA, 0, SOUND_PCM_CH1); }
         u16 m = JOY_readJoypad(JOY_1);
         if (estadoJuego == 0) {
             if (++timer >= 50) { timer = 0; }
@@ -161,17 +166,18 @@ int main() {
                     if (r >= b) { PAL_setColor(48 + k, RGB24_TO_VDPCOLOR(0x040818)); }
                 }
             }
-            if ((m & BUTTON_START) && !(prevM & BUTTON_START)) { timer = 0; sfxLaser(); mostrarSeleccion(); }
+            if ((m & BUTTON_START) && !(prevM & BUTTON_START)) { timer = 0; sfxStart();  XGM_startPlay(mus_hangar); mostrarSeleccion(); }
             prevM = m; SPR_update(); SYS_doVBlankProcess(); continue;
         }
         if (estadoJuego == 1) {
             if ((m & BUTTON_LEFT) && !(prevM & BUTTON_LEFT)) { naveElegida = (naveElegida == 0) ? 2 : naveElegida - 1; sfxLaser(); mostrarSeleccion(); }
             if ((m & BUTTON_RIGHT) && !(prevM & BUTTON_RIGHT)) { naveElegida = (naveElegida + 1) % 3; sfxLaser(); mostrarSeleccion(); }
-            if ((m & (BUTTON_START | BUTTON_A | BUTTON_C)) && !(prevM & (BUTTON_START | BUTTON_A | BUTTON_C))) { sfxLaser(); empezarPartida(); }
+            if ((m & (BUTTON_START | BUTTON_A | BUTTON_C)) && !(prevM & (BUTTON_START | BUTTON_A | BUTTON_C))) { sfxStart(); XGM_startPlay(mus_juego); empezarPartida(); }
             prevM = m; SPR_update(); SYS_doVBlankProcess(); continue;
         }
         if (estadoJuego == 3) {
-            if ((m & BUTTON_START) && !(prevM & BUTTON_START)) { mostrarTitulo(); }
+            if ((m & BUTTON_START) && !(prevM & BUTTON_START)) { mostrarTitulo();
+    XGM_startPlay(mus_titulo); }
             prevM = m; SPR_update(); SYS_doVBlankProcess(); continue;
         }
         scrollY -= 2; VDP_setVerticalScroll(BG_B, scrollY);

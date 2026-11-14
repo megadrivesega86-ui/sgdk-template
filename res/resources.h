@@ -1,9 +1,12 @@
 #ifndef _RES_RESOURCES_H_
 #define _RES_RESOURCES_H_
 
-extern const u8 sfx_laser[2048];
-extern const u8 sfx_boom[7936];
-extern const u8 bgm_tema[35840];
+extern const u8 sfx_laser[1792];
+extern const u8 sfx_boom[4608];
+extern const u8 sfx_start[5120];
+extern const u8 mus_titulo[1024];
+extern const u8 mus_hangar[1024];
+extern const u8 mus_juego[1024];
 extern const SpriteDefinition spr_nave;
 extern const SpriteDefinition spr_nave_r;
 extern const SpriteDefinition spr_nave_a;
