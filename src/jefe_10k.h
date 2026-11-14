@@ -18,8 +18,8 @@ void resetJefe10k() {
 void cicloJefe10k(s16 px, s16 py) {
     if (puntos >= 10000 && !jefeAct && !jefeMuriendo && !jefeVencido) {
         jefeAct = 1; jefeVida = 60; jefeX = 128; jefeY = -48; jefeVX = 2; jefeTiro = 0;
-        PAL_setPalette(PAL3, spr_jefe1.palette->data, CPU);
-        sprJefe = SPR_addSprite(&spr_jefe1, jefeX, jefeY, TILE_ATTR(PAL3, TRUE, FALSE, FALSE));
+        
+        sprJefe = SPR_addSprite(&spr_jefe1, jefeX, jefeY, TILE_ATTR(PAL2, TRUE, FALSE, FALSE));
         for (int i = 0; i < MAX_ENEMIGOS; i++) { enemigos[i].activo = FALSE; SPR_setVisibility(enemigos[i].spr, HIDDEN); }
         sfxStart(); VDP_setTextPalette(PAL0); VDP_drawText("ALERTA: JEFE FINAL!", 10, 12); verBarraJefe();
     }

@@ -1,6 +1,6 @@
-SPRITE spr_nave "nave.png" 4 4 NONE 0
-SPRITE spr_nave_r "nave_roja.png" 4 4 NONE 0
-SPRITE spr_nave_a "nave_azul.png" 4 4 NONE 0
+SPRITE spr_nave "nave.png" 4 4 FAST 3
+SPRITE spr_nave_r "nave_roja.png" 4 4 FAST 3
+SPRITE spr_nave_a "nave_azul.png" 4 4 FAST 3
 SPRITE spr_enemigo "enemigo.png" 4 4 NONE 0
 SPRITE spr_laser "laser.png" 1 1 NONE 0
 SPRITE spr_pwr "powerup.png" 3 3 NONE 0
@@ -28,4 +28,4 @@ XGM mus_titulo "mus_titulo.vgm"
 XGM mus_hangar "mus_hangar.vgm"
 XGM mus_juego "mus_juego.vgm"
 
-SPRITE spr_jefe1 "jefe1.png" 8 6 NONE 0
+SPRITE spr_jefe1 "jefe1.png" 8 6 FAST 4
