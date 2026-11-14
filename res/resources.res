@@ -27,3 +27,5 @@ WAV sfx_start "start.wav" XGM
 XGM mus_titulo "mus_titulo.vgm"
 XGM mus_hangar "mus_hangar.vgm"
 XGM mus_juego "mus_juego.vgm"
+
+SPRITE spr_jefe1 "jefe1.png" 8 6 NONE 0
