@@ -148,6 +148,7 @@ void mostrarSeleccion() {
 
 #include "jefe_10k.h"
 #include "enemigos_f3.h"
+#include "continuar.h"
 void empezarPartida() { resetJefe10k();
     puntos = 0; estadoJuego = 2; nivelArma = 1; bajasPwr = 0; escudo = 0;
     vidas = (naveElegida == 1) ? 2 : ((naveElegida == 2) ? 5 : 3);
@@ -228,6 +229,7 @@ int main() {
             if (pausado) { XGM_pausePlay(); VDP_setTextPalette(PAL0); VDP_drawText("P A U S A", 15, 13); }
             else { VDP_clearText(10, 12, 20); VDP_clearText(10, 13, 20); VDP_clearText(10, 14, 20); XGM_resumePlay(); }
         }
+        if (cicloFinJuego(m, prevM)) { prevM = m; SPR_update(); SYS_doVBlankProcess(); continue; }
         if (pausado) { prevM = m; SYS_doVBlankProcess(); continue; }
         scrollY -= 3; VDP_setVerticalScroll(BG_B, scrollY);
         if (avisoOrbita > 0 && --avisoOrbita == 0) { VDP_clearText(11, 12, 18); }
@@ -305,12 +307,12 @@ int main() {
                     if (escudo > 0) { escudo--; if (escudo == 0) SPR_setVisibility(sprEscudo, HIDDEN); } else { nivelArma = 1; if (vidas > 0) { vidas--; } } verHUD();
                     if (vidas == 0) {
                         VDP_setTextPalette(PAL0);
-                        if (vidas == 0) VDP_drawText("G A M E   O V E R", 11, 12); if (vidas == 0) VDP_drawText("PULSA START", 15, 14);
+                        if (vidas == 0 && !modoFin) abrirContinuar();
                     }
                 }
             }
         }
-        if (estadoJuego == 2) cicloJefe10k(jugador.x, jugador.y); cicloBalasEnemigas();
+        if (estadoJuego == 2) { cicloJefe10k(jugador.x, jugador.y); cicloBalasEnemigas(); }
         SPR_update(); SYS_doVBlankProcess();
     }
     return 0;
