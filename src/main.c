@@ -40,10 +40,10 @@ void verHUD() {
     const char* nom[3] = {"DREAMER", "RAVEN-X", "COLOSSUS"};
     PAL_setColor(63, RGB24_TO_VDPCOLOR(0xFFCC00));
     VDP_setTextPalette(PAL3);
-    sprintf(h1, "1UP           SCORE     STAGE %d", faseActual + 1);
+    sprintf(h1, "JUGADOR 1     SCORE     STAGE %d", faseActual + 1);
     VDP_drawText(h1, 1, 1);
     VDP_setTextPalette(PAL0);
-    sprintf(h2, "%-8s      %06lu           ", nom[naveElegida], puntos);
+    sprintf(h2, "%-8s      %06lu          ", nom[naveElegida], puntos);
     VDP_drawText(h2, 1, 2);
     sprintf(h3, "  x%-2d              %4s %7s", vidas,
         (escudo == 3) ? "[S3]" : ((escudo == 2) ? "[S2]" : ((escudo == 1) ? "[S1]" : "    ")),

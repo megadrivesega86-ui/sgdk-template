@@ -49,7 +49,7 @@ void cicloJefe10k(s16 px, s16 py) {
                 balas[i].activo = FALSE; SPR_setVisibility(balas[i].spr, HIDDEN);
                 crearExp(balas[i].x, balas[i].y); sfxBoom();
                 jefeVida--; verBarraJefe(); if (jefeVida <= 0) { VDP_clearText(6, 4, 28);
-                    jefeAct = 0; jefeMuriendo = 180; XGM_stopPlay();
+                    jefeAct = 0; jefeMuriendo = 180; autoFire = 0; verHUD(); XGM_stopPlay();
                     for (u8 k = 0; k < 3; k++) { jbAct[k] = 0; if (sprJB[k]) SPR_setVisibility(sprJB[k], HIDDEN); }
                     break;
                 }
