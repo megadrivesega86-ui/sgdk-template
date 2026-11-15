@@ -268,14 +268,19 @@ int main() {
         }
         if (++timer >= 42) { crearEnemigo(); timer = 0; }
         if (!jefeAct && !jefeMuriendo && !jefeIntro && !jefeCine) for (int i = 0; i < MAX_ENEMIGOS; i++) if (enemigos[i].activo) {
-            enemigos[i].y += 2;
+            enemigos[i].y += (faseActual > 0) ? 3 : 2;
+                if (faseActual > 0) {
+                    enemigos[i].x += (((timer + i * 19) & 64) ? 1 : -1);
+                    if (enemigos[i].x < 16) enemigos[i].x = 16;
+                    if (enemigos[i].x > 272) enemigos[i].x = 272;
+                }
             if (enemigos[i].y > 224) { enemigos[i].activo = FALSE; SPR_setVisibility(enemigos[i].spr, HIDDEN); }
             else {
                 SPR_setPosition(enemigos[i].spr, enemigos[i].x, enemigos[i].y);
                 for (int b = 0; b < MAX_BALAS; b++) if (balas[b].activo && choca(balas[b].x, balas[b].y, 8, 8, enemigos[i].x+2, enemigos[i].y+2, 28, 28)) {
                     balas[b].activo = FALSE; SPR_setVisibility(balas[b].spr, HIDDEN);
                     enemigos[i].activo = FALSE; SPR_setVisibility(enemigos[i].spr, HIDDEN);
-                    crearExp(enemigos[i].x, enemigos[i].y); sfxBoom(); puntos += 100; if (++bajasPwr >= 4 && !pwr.activo) {
+                    crearExp(enemigos[i].x, enemigos[i].y); sfxBoom(); puntos += (faseActual > 0) ? 150 : 100; if (++bajasPwr >= 4 && !pwr.activo) {
                         bajasPwr = 0;
                         u8 disp[3], nd = 0;
                         if (nivelArma < 2) disp[nd++] = 0;
