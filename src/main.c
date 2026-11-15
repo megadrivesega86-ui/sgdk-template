@@ -30,10 +30,19 @@ void sfxBoom()  { XGM_startPlayPCM(ID_SFX_BOOM, 14, SOUND_PCM_CH3); }
 void sfxStart() { XGM_startPlayPCM(ID_SFX_START, 15, SOUND_PCM_CH4); }
 
 void verHUD() {
-    const char* nom[] = {"DREAMER", "RAVEN-X", "COLOSSUS"};
+    char h1[42], h2[42], h3[42];
+    const char* nom[3] = {"DREAMER", "RAVEN-X", "COLOSSUS"};
+    PAL_setColor(63, RGB24_TO_VDPCOLOR(0xFFCC00));
+    VDP_setTextPalette(PAL3);
+    sprintf(h1, "1UP         SCORE      STAGE %d", faseActual + 1);
+    VDP_drawText(h1, 1, 1);
     VDP_setTextPalette(PAL0);
-    sprintf(hud, "%-8s %05lu V:%d %s%s", nom[naveElegida], puntos, vidas, (escudo == 3) ? "[S3]" : ((escudo == 2) ? "[S2]" : ((escudo == 1) ? "[S1]" : "    ")), (nivelArma > 1) ? "[W]" : (autoFire ? "[A]" : "   "));
-    VDP_drawText(hud, 1, 1);
+    sprintf(h2, "%-8s    %06lu            ", nom[naveElegida], puntos);
+    VDP_drawText(h2, 1, 2);
+    sprintf(h3, "SHIP x%-2d          %4s %7s", vidas,
+        (escudo == 3) ? "[S3]" : ((escudo == 2) ? "[S2]" : ((escudo == 1) ? "[S1]" : "    ")),
+        (nivelArma > 1) ? "[W-MAX]" : (autoFire ? "[A]    " : "       "));
+    VDP_drawText(h3, 1, 3);
 }
 
 void crearExp(s16 x, s16 y) {

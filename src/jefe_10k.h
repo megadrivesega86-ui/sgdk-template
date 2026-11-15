@@ -8,10 +8,10 @@ void verBarraJefe() {
     char b[28]; int n = (jefeVida > 0) ? (jefeVida + 14) / 15 : 0;
     strcpy(b, "BOSS [....................]");
     for (int i = 0; i < n && i < 20; i++) b[6 + i] = 35;
-    PAL_setColor(63, RGB24_TO_VDPCOLOR(0xFFCC00)); VDP_setTextPalette(PAL3); VDP_drawText(b, 6, 2); VDP_setTextPalette(PAL0);
+    PAL_setColor(63, RGB24_TO_VDPCOLOR(0xFFCC00)); VDP_setTextPalette(PAL3); VDP_drawText(b, 6, 4); VDP_setTextPalette(PAL0);
 }
 void resetJefe10k() {
-    VDP_clearText(6, 2, 28); msgFase2Timer = 0; VDP_clearText(10, 12, 20);
+    VDP_clearText(6, 4, 28); msgFase2Timer = 0; VDP_clearText(10, 12, 20);
     if (sprJefe) { SPR_releaseSprite(sprJefe); sprJefe = NULL; }
     for (u8 k = 0; k < 2; k++) { jbAct[k] = 0; if (sprJB[k]) SPR_setVisibility(sprJB[k], HIDDEN); }
     jefeAct = 0; jefeMuriendo = 0; jefeIntro = 0; jefeCine = 0; cineVel = 0; jefeVencido = 0; jefeVida = 0;
@@ -45,7 +45,7 @@ void cicloJefe10k(s16 px, s16 py) {
             if (balas[i].x < jefeX + 62 && balas[i].x + 6 > jefeX + 2 && balas[i].y < jefeY + 44 && balas[i].y + 10 > jefeY + 4) {
                 balas[i].activo = FALSE; SPR_setVisibility(balas[i].spr, HIDDEN);
                 crearExp(balas[i].x, balas[i].y); sfxBoom();
-                jefeVida--; verBarraJefe(); if (jefeVida <= 0) { VDP_clearText(6, 2, 28);
+                jefeVida--; verBarraJefe(); if (jefeVida <= 0) { VDP_clearText(6, 4, 28);
                     jefeAct = 0; jefeMuriendo = 180; XGM_stopPlay();
                     for (u8 k = 0; k < 2; k++) { jbAct[k] = 0; if (sprJB[k]) SPR_setVisibility(sprJB[k], HIDDEN); }
                     break;
