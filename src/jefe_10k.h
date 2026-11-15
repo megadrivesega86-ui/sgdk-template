@@ -38,7 +38,7 @@ void cicloJefe10k(s16 px, s16 py) {
             jefeTiro = 0;
             for (u8 k = 0; k < 2; k++) if (!jbAct[k]) {
                 jbAct[k] = 1; jbX[k] = jefeX + (k ? 46 : 14); jbY[k] = jefeY + 42;
-                if (!sprJB[k]) sprJB[k] = SPR_addSprite(&spr_laser, jbX[k], jbY[k], TILE_ATTR(PAL2, TRUE, FALSE, FALSE));
+                if (!sprJB[k]) sprJB[k] = SPR_addSprite(&spr_bala_jefe, jbX[k] - 4, jbY[k], TILE_ATTR(PAL3, TRUE, FALSE, FALSE));
                 else { SPR_setVisibility(sprJB[k], VISIBLE); SPR_setPosition(sprJB[k], jbX[k], jbY[k]); }
             }
         }
@@ -107,7 +107,7 @@ void cicloJefe10k(s16 px, s16 py) {
             } else {
                 jugador.y = 176; jefeCine = 0;
                 VDP_setTextPalette(PAL0); VDP_drawText("FASE 2: ALTA ALTITUD", 10, 12);
-                msgFase2Timer = 120;
+                msgFase2Timer = 120; VDP_clearText(14, 14, 12);
                 XGM_setLoopNumber(-1); XGM_startPlay(mus_juego);
             }
         }

@@ -33,3 +33,5 @@ SPRITE spr_jefe1 "jefe1.png" 8 6 FAST 4
 XGM mus_jefe "jefe.vgm" AUTO
 
 XGM mus_victoria "victoria.vgm" AUTO
+
+SPRITE spr_bala_jefe "bala_jefe.png" 2 2 FAST 3
