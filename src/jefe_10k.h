@@ -72,7 +72,7 @@ void cicloJefe10k(s16 px, s16 py) {
         if (jefeMuriendo == 0) {
             SPR_releaseSprite(sprJefe); sprJefe = NULL; jefeVencido = 1;
             puntos += 5000; verHUD();
-            XGM_setLoopNumber(0); XGM_startPlay(mus_victoria);
+            XGM_setLoopNumber(-1); XGM_startPlay(mus_victoria);
             jefeCine = 1; cineVel = 0;
         }
     }
