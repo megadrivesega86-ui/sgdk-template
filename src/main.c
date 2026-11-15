@@ -147,6 +147,7 @@ void mostrarSeleccion() {
 }
 
 #include "jefe_10k.h"
+#include "enemigos_f3.h"
 void empezarPartida() { resetJefe10k();
     puntos = 0; estadoJuego = 2; nivelArma = 1; bajasPwr = 0; escudo = 0;
     vidas = (naveElegida == 1) ? 2 : ((naveElegida == 2) ? 5 : 3);
@@ -309,7 +310,7 @@ int main() {
                 }
             }
         }
-        if (estadoJuego == 2) cicloJefe10k(jugador.x, jugador.y);
+        if (estadoJuego == 2) cicloJefe10k(jugador.x, jugador.y); cicloBalasEnemigas();
         SPR_update(); SYS_doVBlankProcess();
     }
     return 0;
