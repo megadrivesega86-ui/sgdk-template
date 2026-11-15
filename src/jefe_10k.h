@@ -1,5 +1,6 @@
 Sprite *sprJefe = NULL, *sprJB[2] = {NULL, NULL};
 s16 jefeX = 128, jefeY = -48, jefeVX = 2, jefeVida = 0, jbX[2], jbY[2];
+u8 msgFase2Timer = 0, jefeIntro = 0;
 u8 jefeAct = 0, jefeMuriendo = 0, jefeVencido = 0, jefeTiro = 0, jbAct[2] = {0, 0};
 
 void verBarraJefe() {
@@ -9,19 +10,23 @@ void verBarraJefe() {
     VDP_setTextPalette(PAL0); VDP_drawText(b, 6, 2);
 }
 void resetJefe10k() {
-    VDP_clearText(6, 2, 28);
+    VDP_clearText(6, 2, 28); msgFase2Timer = 0; VDP_clearText(10, 12, 20);
     if (sprJefe) { SPR_releaseSprite(sprJefe); sprJefe = NULL; }
     for (u8 k = 0; k < 2; k++) { jbAct[k] = 0; if (sprJB[k]) SPR_setVisibility(sprJB[k], HIDDEN); }
-    jefeAct = 0; jefeMuriendo = 0; jefeVencido = 0; jefeVida = 0;
+    jefeAct = 0; jefeMuriendo = 0; jefeIntro = 0; jefeVencido = 0; jefeVida = 0;
 }
 
 void cicloJefe10k(s16 px, s16 py) {
-    if (puntos >= 10000 && !jefeAct && !jefeMuriendo && !jefeVencido) {
-        jefeAct = 1; jefeVida = 60; jefeX = 128; jefeY = -48; jefeVX = 2; jefeTiro = 0;
-        
-        sprJefe = SPR_addSprite(&spr_jefe1, jefeX, jefeY, TILE_ATTR(PAL2, TRUE, FALSE, FALSE));
+    if (msgFase2Timer > 0 && --msgFase2Timer == 0) VDP_clearText(10, 12, 20);
+    if (puntos >= 10000 && !jefeAct && !jefeMuriendo && !jefeVencido && !jefeIntro) {
+        jefeIntro = 60; XGM_stopPlay();
         for (int i = 0; i < MAX_ENEMIGOS; i++) { enemigos[i].activo = FALSE; SPR_setVisibility(enemigos[i].spr, HIDDEN); }
-        sfxStart(); VDP_setTextPalette(PAL0); VDP_drawText("ALERTA: JEFE FINAL!", 10, 12); verBarraJefe();
+        VDP_setTextPalette(PAL0); VDP_drawText("ALERTA: JEFE FINAL!", 10, 12);
+    }
+    if (jefeIntro > 0 && --jefeIntro == 0) {
+        jefeAct = 1; jefeVida = 60; jefeX = 128; jefeY = -48; jefeVX = 2; jefeTiro = 0;
+        sprJefe = SPR_addSprite(&spr_jefe1, jefeX, jefeY, TILE_ATTR(PAL2, TRUE, FALSE, FALSE));
+        XGM_setLoopNumber(-1); XGM_startPlay(mus_jefe); verBarraJefe();
     }
     if (jefeAct) {
         if (jefeY < 26) { jefeY++; if (jefeY == 26) VDP_clearText(10, 12, 20); }
@@ -40,7 +45,7 @@ void cicloJefe10k(s16 px, s16 py) {
                 balas[i].activo = FALSE; SPR_setVisibility(balas[i].spr, HIDDEN);
                 crearExp(balas[i].x, balas[i].y); sfxBoom();
                 jefeVida--; verBarraJefe(); if (jefeVida <= 0) { VDP_clearText(6, 2, 28);
-                    jefeAct = 0; jefeMuriendo = 120;
+                    jefeAct = 0; jefeMuriendo = 180; XGM_stopPlay();
                     for (u8 k = 0; k < 2; k++) { jbAct[k] = 0; if (sprJB[k]) SPR_setVisibility(sprJB[k], HIDDEN); }
                     break;
                 }
@@ -65,7 +70,11 @@ void cicloJefe10k(s16 px, s16 py) {
         if (jefeMuriendo == 0) {
             SPR_releaseSprite(sprJefe); sprJefe = NULL; jefeVencido = 1;
             puntos += 5000; verHUD(); sfxStart();
-            VDP_setTextPalette(PAL0); VDP_drawText("  JEFE DESTRUIDO!   ", 10, 12);
+            PAL_setPalette(PAL0, img_altura.palette->data, CPU); PAL_setColor(15, RGB24_TO_VDPCOLOR(0xFFFFFF));
+            VDP_drawImageEx(BG_B, &img_altura, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX), 0, 0, FALSE, TRUE);
+            VDP_drawImageEx(BG_B, &img_altura, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX), 32, 0, FALSE, TRUE);
+            VDP_setTextPalette(PAL0); VDP_drawText("FASE 2: ALTA ALTITUD", 10, 12);
+            faseActual = 1; msgFase2Timer = 120; XGM_setLoopNumber(-1); XGM_startPlay(mus_juego); XGM_setLoopNumber(-1); XGM_startPlay(mus_juego);
         }
     }
 }

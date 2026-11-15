@@ -68,9 +68,9 @@ void disparar() {
     sfxLaser();
 }
 
-extern u8 jefeAct, jefeMuriendo;
+extern u8 jefeAct, jefeMuriendo, jefeIntro;
 void crearEnemigo() {
-    if (!jefeAct && !jefeMuriendo) for (int i = 0; i < MAX_ENEMIGOS; i++) {
+    if (!jefeAct && !jefeMuriendo && !jefeIntro) for (int i = 0; i < MAX_ENEMIGOS; i++) {
         if (!enemigos[i].activo) {
             enemigos[i].activo = TRUE; enemigos[i].x = (random() % 272) + 16; enemigos[i].y = -32;
             SPR_setVisibility(enemigos[i].spr, VISIBLE); SPR_setPosition(enemigos[i].spr, enemigos[i].x, enemigos[i].y); break;
@@ -152,7 +152,7 @@ void empezarPartida() { resetJefe10k();
     jugador.spr = SPR_addSprite(defNave, jugador.x, jugador.y, TILE_ATTR(PAL1, 0, FALSE, FALSE));
 
     for (int i = 0; i < MAX_BALAS; i++) { balas[i].activo = FALSE; balas[i].spr = SPR_addSprite(&spr_laser, 0, 0, TILE_ATTR(PAL3, 0, FALSE, FALSE)); SPR_setVisibility(balas[i].spr, HIDDEN); }
-    if (!jefeAct && !jefeMuriendo) for (int i = 0; i < MAX_ENEMIGOS; i++) { enemigos[i].activo = FALSE; enemigos[i].spr = SPR_addSprite(&spr_enemigo, 0, 0, TILE_ATTR(PAL2, 0, FALSE, FALSE)); SPR_setVisibility(enemigos[i].spr, HIDDEN); }
+    if (!jefeAct && !jefeMuriendo && !jefeIntro) for (int i = 0; i < MAX_ENEMIGOS; i++) { enemigos[i].activo = FALSE; enemigos[i].spr = SPR_addSprite(&spr_enemigo, 0, 0, TILE_ATTR(PAL2, 0, FALSE, FALSE)); SPR_setVisibility(enemigos[i].spr, HIDDEN); }
     for (int i = 0; i < MAX_EXP; i++) { exps[i].activo = FALSE; exps[i].spr = SPR_addSprite(&spr_exp, 0, 0, TILE_ATTR(PAL3, 0, FALSE, FALSE)); SPR_setVisibility(exps[i].spr, HIDDEN); }
     pwr.activo = FALSE; pwr.spr = SPR_addSprite(&spr_pwr, 0, 0, TILE_ATTR(PAL3, 0, FALSE, FALSE)); SPR_setVisibility(pwr.spr, HIDDEN);
     sprEscudo = SPR_addSprite(&spr_escudo, jugador.x, jugador.y, TILE_ATTR(PAL3, 0, FALSE, FALSE)); SPR_setVisibility(sprEscudo, HIDDEN);
@@ -246,7 +246,7 @@ int main() {
             }
         }
         if (++timer >= 42) { crearEnemigo(); timer = 0; }
-        if (!jefeAct && !jefeMuriendo) for (int i = 0; i < MAX_ENEMIGOS; i++) if (enemigos[i].activo) {
+        if (!jefeAct && !jefeMuriendo && !jefeIntro) for (int i = 0; i < MAX_ENEMIGOS; i++) if (enemigos[i].activo) {
             enemigos[i].y += 2;
             if (enemigos[i].y > 224) { enemigos[i].activo = FALSE; SPR_setVisibility(enemigos[i].spr, HIDDEN); }
             else {

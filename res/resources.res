@@ -29,3 +29,5 @@ XGM mus_hangar "mus_hangar.vgm"
 XGM mus_juego "mus_juego.vgm"
 
 SPRITE spr_jefe1 "jefe1.png" 8 6 FAST 4
+
+XGM mus_jefe "jefe.vgm" AUTO
