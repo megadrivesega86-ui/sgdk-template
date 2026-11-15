@@ -29,7 +29,7 @@ void cicloJefe10k(s16 px, s16 py) {
     }
     if (jefeIntro > 0 && --jefeIntro == 0) {
         jefeAct = 1; jefeVida = (jefeTipo == 2) ? 450 : 300; jefeX = 128; jefeY = -48; jefeVX = (jefeTipo == 2) ? 3 : 2; jefeTiro = 0;
-        sprJefe = SPR_addSprite((jefeTipo == 2) ? &spr_jefe2 : &spr_jefe1, jefeX, jefeY, TILE_ATTR(PAL2, TRUE, FALSE, FALSE));
+        if (jefeTipo == 1) PAL_setPalette(PAL2, spr_jefe1.palette->data, CPU); sprJefe = SPR_addSprite((jefeTipo == 2) ? &spr_jefe2 : &spr_jefe1, jefeX, jefeY, TILE_ATTR(PAL2, TRUE, FALSE, FALSE));
         XGM_setLoopNumber(-1); XGM_startPlay(mus_jefe); verBarraJefe();
     }
     if (jefeAct) {
