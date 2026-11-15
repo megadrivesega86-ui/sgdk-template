@@ -10,7 +10,7 @@ void verBarraJefe() {
     char b[28]; int n = (jefeVida > 0) ? (jefeTipo == 2) ? ((jefeVida + 22) / 23) : ((jefeVida + 14) / 15) : 0;
     strcpy(b, "BOSS [....................]");
     for (int i = 0; i < n && i < 20; i++) b[6 + i] = 35;
-    PAL_setColor(63, (jefeTipo == 2) ? RGB24_TO_VDPCOLOR(0xFF3300) : RGB24_TO_VDPCOLOR(0xFFCC00)); VDP_setTextPalette(PAL3); VDP_drawText(b, 6, 4); VDP_setTextPalette(PAL0);
+    PAL_setColor(63, RGB24_TO_VDPCOLOR(0xFFCC00)); VDP_setTextPalette(PAL3); VDP_drawText(b, 6, 4); VDP_setTextPalette(PAL0);
 }
 void resetJefe10k() {
     VDP_clearText(6, 4, 28); msgFase2Timer = 0; VDP_clearText(10, 12, 20);
