@@ -19,7 +19,7 @@ Sprite* sprEscudo;
 Entidad jugador, balas[MAX_BALAS], enemigos[MAX_ENEMIGOS], exps[MAX_EXP];
 u32 puntos = 0;
 u16 vidas = 3, cd = 0, timer = 0, prevM = 0;
-u8 estadoJuego = 0;
+u8 pausado = 0, estadoJuego = 0;
 u8 naveElegida = 0;
 bool autoFire = FALSE;
 s16 scrollY = 0;
@@ -207,6 +207,12 @@ int main() {
             if (despegue == 0) { VDP_clearText(13, 12, 14); }
             prevM = m; SPR_update(); SYS_doVBlankProcess(); continue;
         }
+        if (vidas > 0 && despegue == 0 && !jefeCine && (m & BUTTON_START) && !(prevM & BUTTON_START)) {
+            pausado = !pausado; sfxStart();
+            if (pausado) { XGM_pausePlay(); VDP_setTextPalette(PAL0); VDP_drawText("P A U S A", 15, 13); }
+            else { VDP_clearText(15, 13, 10); XGM_resumePlay(); }
+        }
+        if (pausado) { prevM = m; SYS_doVBlankProcess(); continue; }
         scrollY -= 3; VDP_setVerticalScroll(BG_B, scrollY);
         if (avisoOrbita > 0 && --avisoOrbita == 0) { VDP_clearText(11, 12, 18); }
         s16 vel = (naveElegida == 1) ? 5 : ((naveElegida == 2) ? 2 : 3);
