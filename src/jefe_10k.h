@@ -68,7 +68,7 @@ void cicloJefe10k(s16 px, s16 py) {
         jefeMuriendo--;
         SPR_setPosition(sprJefe, jefeX + ((jefeMuriendo & 2) ? 4 : -4), jefeY + ((jefeMuriendo & 4) ? 2 : -2));
         SPR_setVisibility(sprJefe, (jefeMuriendo & 1) ? VISIBLE : HIDDEN);
-        if ((jefeMuriendo % 10) == 0) { sfxBoom(); crearExp(jefeX + (random() & 31) + 8, jefeY + (random() & 31)); }
+        if ((jefeMuriendo % 10) == 0) { if (jefeMuriendo >= 30 && (jefeMuriendo % 30) == 0) sfxBoom(); crearExp(jefeX + (random() & 31) + 8, jefeY + (random() & 31)); }
         if (jefeMuriendo == 0) {
             SPR_releaseSprite(sprJefe); sprJefe = NULL; jefeVencido = 1;
             puntos += 5000; verHUD();
