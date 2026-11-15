@@ -30,19 +30,25 @@ void sfxBoom()  { XGM_startPlayPCM(ID_SFX_BOOM, 14, SOUND_PCM_CH3); }
 void sfxStart() { XGM_startPlayPCM(ID_SFX_START, 15, SOUND_PCM_CH4); }
 
 void verHUD() {
+    static u8 tileIcono = 0;
+    if (!tileIcono) {
+        const u32 ico[8] = {0x000FF000,0x00FFF000,0x0FFFFF00,0xFF0F0FF0,0xFFFFF0FF,0xF0FFF00F,0x00F0F000,0x00000000};
+        VDP_loadTileData(ico, 1400, 1, CPU);
+        tileIcono = 1;
+    }
     char h1[42], h2[42], h3[42];
     const char* nom[3] = {"DREAMER", "RAVEN-X", "COLOSSUS"};
     PAL_setColor(63, RGB24_TO_VDPCOLOR(0xFFCC00));
     VDP_setTextPalette(PAL3);
-    sprintf(h1, "1UP         SCORE      STAGE %d", faseActual + 1);
+    sprintf(h1, "1UP           SCORE     STAGE %d", faseActual + 1);
     VDP_drawText(h1, 1, 1);
     VDP_setTextPalette(PAL0);
-    sprintf(h2, "%-8s    %06lu            ", nom[naveElegida], puntos);
+    sprintf(h2, "%-8s      %06lu           ", nom[naveElegida], puntos);
     VDP_drawText(h2, 1, 2);
-    sprintf(h3, "SHIP x%-2d          %4s %7s", vidas,
+    sprintf(h3, "  x%-2d              %4s %7s", vidas,
         (escudo == 3) ? "[S3]" : ((escudo == 2) ? "[S2]" : ((escudo == 1) ? "[S1]" : "    ")),
         (nivelArma > 1) ? "[W-MAX]" : (autoFire ? "[A]    " : "       "));
-    VDP_drawText(h3, 1, 3);
+    VDP_drawText(h3, 1, 3); VDP_setTileMapXY(BG_A, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 1400), 1, 3); VDP_setTileMapXY(BG_A, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 1400), 2, 3);
 }
 
 void crearExp(s16 x, s16 y) {

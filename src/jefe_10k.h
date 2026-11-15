@@ -18,6 +18,7 @@ void resetJefe10k() {
 }
 
 void cicloJefe10k(s16 px, s16 py) {
+    static u16 palNave[16];
     if (msgFase2Timer > 0 && --msgFase2Timer == 0) VDP_clearText(10, 12, 20);
     if (puntos >= 10000 && !jefeAct && !jefeMuriendo && !jefeVencido && !jefeIntro) {
         jefeIntro = 60; XGM_stopPlay();
@@ -89,8 +90,8 @@ void cicloJefe10k(s16 px, s16 py) {
             if ((cineVel & 1) == 0) crearExp(jugador.x + 8, jugador.y + 26);
             if (jugador.y < -32) jefeCine = 3;
         } else if (jefeCine == 3) {
-            PAL_fadeOutAll(25, FALSE);
-            u16 p[64]; memcpy(p, img_altura.palette->data, 32); memcpy(p+16, spr_nave.palette->data, 32); memcpy(p+32, spr_enemigo.palette->data, 32); memcpy(p+48, spr_pwr.palette->data, 32); *(p+15) = RGB24_TO_VDPCOLOR(0xFFFFFF);
+            PAL_getPalette(PAL1, palNave); PAL_getPalette(PAL1, palNave); PAL_getPalette(PAL1, palNave); PAL_fadeOutAll(25, FALSE);
+            u16 p[64]; memcpy(p, img_altura.palette->data, 32); memcpy(p+16, palNave, 32); memcpy(p+32, spr_enemigo.palette->data, 32); memcpy(p+48, spr_pwr.palette->data, 32); *(p+15) = RGB24_TO_VDPCOLOR(0xFFFFFF);
             VDP_drawImageEx(BG_B, &img_altura, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX), 0, 0, FALSE, TRUE);
             VDP_drawImageEx(BG_B, &img_altura, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX), 32, 0, FALSE, TRUE);
             faseActual = 1; jugador.x = 144; jugador.y = -36;
@@ -114,5 +115,5 @@ void cicloJefe10k(s16 px, s16 py) {
         if (escudo > 0) SPR_setPosition(sprEscudo, jugador.x - 4, jugador.y - 4);
         for (int i = 0; i < MAX_EXP; i++) if (exps[i].activo && --exps[i].vida == 0) { exps[i].activo = FALSE; SPR_setVisibility(exps[i].spr, HIDDEN); }
     }
-u16 p[64]; memcpy(p, img_altura.palette->data, 32); memcpy(p+16, spr_nave.palette->data, 32); memcpy(p+32, spr_enemigo.palette->data, 32); memcpy(p+48, spr_pwr.palette->data, 32); *(p+15) = RGB24_TO_VDPCOLOR(0xFFFFFF);
+u16 p[64]; memcpy(p, img_altura.palette->data, 32); memcpy(p+16, palNave, 32); memcpy(p+32, spr_enemigo.palette->data, 32); memcpy(p+48, spr_pwr.palette->data, 32); *(p+15) = RGB24_TO_VDPCOLOR(0xFFFFFF);
             }
