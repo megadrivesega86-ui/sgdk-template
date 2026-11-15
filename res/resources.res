@@ -5,7 +5,7 @@ SPRITE spr_enemigo "enemigo.png" 4 4 NONE 0
 SPRITE spr_laser "laser.png" 1 1 NONE 0
 SPRITE spr_pwr "powerup.png" 3 3 NONE 0
 SPRITE spr_escudo "escudo.png" 4 4 NONE 0
-SPRITE spr_exp "explosion.png" 4 4 NONE 0
+SPRITE spr_exp "explosion.png" 4 4 FAST 3
 IMAGE img_fondo "fondo.png" FAST
 IMAGE img_tierra "tierra.png" FAST
 IMAGE img_altura "altura.png" FAST
