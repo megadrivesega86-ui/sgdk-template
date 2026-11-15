@@ -226,7 +226,7 @@ int main() {
         if (vidas > 0 && despegue == 0 && !jefeCine && (m & BUTTON_START) && !(prevM & BUTTON_START)) {
             pausado = !pausado; sfxStart();
             if (pausado) { XGM_pausePlay(); VDP_setTextPalette(PAL0); VDP_drawText("P A U S A", 15, 13); }
-            else { VDP_clearText(14, 13, 12); VDP_clearText(14, 14, 12); XGM_resumePlay(); }
+            else { VDP_clearText(10, 12, 20); VDP_clearText(10, 13, 20); VDP_clearText(10, 14, 20); XGM_resumePlay(); }
         }
         if (pausado) { prevM = m; SYS_doVBlankProcess(); continue; }
         scrollY -= 3; VDP_setVerticalScroll(BG_B, scrollY);
@@ -305,7 +305,7 @@ int main() {
                     if (escudo > 0) { escudo--; if (escudo == 0) SPR_setVisibility(sprEscudo, HIDDEN); } else { nivelArma = 1; if (vidas > 0) { vidas--; } } verHUD();
                     if (vidas == 0) {
                         VDP_setTextPalette(PAL0);
-                        VDP_drawText("G A M E   O V E R", 11, 12); if (vidas == 0) VDP_drawText("PULSA START", 15, 14);
+                        if (vidas == 0) VDP_drawText("G A M E   O V E R", 11, 12); if (vidas == 0) VDP_drawText("PULSA START", 15, 14);
                     }
                 }
             }
