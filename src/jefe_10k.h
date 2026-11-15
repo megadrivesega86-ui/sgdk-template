@@ -4,10 +4,10 @@ u8 msgFase2Timer = 0, jefeIntro = 0;
 u8 jefeAct = 0, jefeMuriendo = 0, jefeVencido = 0, jefeTiro = 0, jbAct[2] = {0, 0};
 
 void verBarraJefe() {
-    char b[28]; int n = (jefeVida > 0) ? (jefeVida + 2) / 3 : 0;
-    strcpy(b, "JEFE [--------------------]");
-    for (int i = 0; i < n && i < 20; i++) b[6 + i] = 61;
-    VDP_setTextPalette(PAL0); VDP_drawText(b, 6, 2);
+    char b[28]; int n = (jefeVida > 0) ? (jefeVida + 14) / 15 : 0;
+    strcpy(b, "BOSS [....................]");
+    for (int i = 0; i < n && i < 20; i++) b[6 + i] = 35;
+    PAL_setColor(63, RGB24_TO_VDPCOLOR(0xFFCC00)); VDP_setTextPalette(PAL3); VDP_drawText(b, 6, 2); VDP_setTextPalette(PAL0);
 }
 void resetJefe10k() {
     VDP_clearText(6, 2, 28); msgFase2Timer = 0; VDP_clearText(10, 12, 20);
@@ -24,7 +24,7 @@ void cicloJefe10k(s16 px, s16 py) {
         VDP_setTextPalette(PAL0); VDP_drawText("ALERTA: JEFE FINAL!", 10, 12);
     }
     if (jefeIntro > 0 && --jefeIntro == 0) {
-        jefeAct = 1; jefeVida = 60; jefeX = 128; jefeY = -48; jefeVX = 2; jefeTiro = 0;
+        jefeAct = 1; jefeVida = 300; jefeX = 128; jefeY = -48; jefeVX = 2; jefeTiro = 0;
         sprJefe = SPR_addSprite(&spr_jefe1, jefeX, jefeY, TILE_ATTR(PAL2, TRUE, FALSE, FALSE));
         XGM_setLoopNumber(-1); XGM_startPlay(mus_jefe); verBarraJefe();
     }
