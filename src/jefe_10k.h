@@ -34,7 +34,7 @@ void cicloJefe10k(s16 px, s16 py) {
     }
     if (jefeAct) {
         if (jefeY < 26) { jefeY++; if (jefeY == 26) VDP_clearText(10, 12, 20); }
-        else { jefeX += jefeVX; if (jefeX < 16 || jefeX > 240) jefeVX = -jefeVX; }
+        else { jefeX += jefeVX; if (jefeX < 16 || jefeX > 208) jefeVX = -jefeVX; }
         SPR_setPosition(sprJefe, jefeX, jefeY);
         if (++jefeTiro >= 40 && jefeY >= 26) {
             jefeTiro = 0;
