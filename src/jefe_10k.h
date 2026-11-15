@@ -1,6 +1,7 @@
 Sprite *sprJefe = NULL, *sprJB[2] = {NULL, NULL};
 s16 jefeX = 128, jefeY = -48, jefeVX = 2, jefeVida = 0, jbX[2], jbY[2];
-u8 msgFase2Timer = 0, jefeIntro = 0;
+u8 msgFase2Timer = 0, jefeIntro = 0, jefeCine = 0;
+s16 cineVel = 0;
 u8 jefeAct = 0, jefeMuriendo = 0, jefeVencido = 0, jefeTiro = 0, jbAct[2] = {0, 0};
 
 void verBarraJefe() {
@@ -13,7 +14,7 @@ void resetJefe10k() {
     VDP_clearText(6, 2, 28); msgFase2Timer = 0; VDP_clearText(10, 12, 20);
     if (sprJefe) { SPR_releaseSprite(sprJefe); sprJefe = NULL; }
     for (u8 k = 0; k < 2; k++) { jbAct[k] = 0; if (sprJB[k]) SPR_setVisibility(sprJB[k], HIDDEN); }
-    jefeAct = 0; jefeMuriendo = 0; jefeIntro = 0; jefeVencido = 0; jefeVida = 0;
+    jefeAct = 0; jefeMuriendo = 0; jefeIntro = 0; jefeCine = 0; cineVel = 0; jefeVencido = 0; jefeVida = 0;
 }
 
 void cicloJefe10k(s16 px, s16 py) {
@@ -69,12 +70,49 @@ void cicloJefe10k(s16 px, s16 py) {
         if ((jefeMuriendo % 10) == 0) { sfxBoom(); crearExp(jefeX + (random() & 31) + 8, jefeY + (random() & 31)); }
         if (jefeMuriendo == 0) {
             SPR_releaseSprite(sprJefe); sprJefe = NULL; jefeVencido = 1;
-            puntos += 5000; verHUD(); sfxStart();
-            PAL_setPalette(PAL0, img_altura.palette->data, CPU); PAL_setColor(15, RGB24_TO_VDPCOLOR(0xFFFFFF));
-            VDP_drawImageEx(BG_B, &img_altura, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX), 0, 0, FALSE, TRUE);
-            VDP_drawImageEx(BG_B, &img_altura, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX), 32, 0, FALSE, TRUE);
-            VDP_setTextPalette(PAL0); VDP_drawText("FASE 2: ALTA ALTITUD", 10, 12);
-            faseActual = 1; msgFase2Timer = 120; XGM_setLoopNumber(-1); XGM_startPlay(mus_juego); XGM_setLoopNumber(-1); XGM_startPlay(mus_juego);
+            puntos += 5000; verHUD();
+            XGM_setLoopNumber(0); XGM_startPlay(mus_victoria);
+            jefeCine = 1; cineVel = 0;
         }
     }
-}
+    if (jefeCine > 0) {
+        SPR_setAnim(jugador.spr, 0); SPR_setHFlip(jugador.spr, FALSE);
+        if (jefeCine == 1) {
+            if (jugador.x < 143) jugador.x += 2; else if (jugador.x > 145) jugador.x -= 2; else jugador.x = 144;
+            if (jugador.y < 175) jugador.y += 2; else if (jugador.y > 177) jugador.y -= 2; else jugador.y = 176;
+            if (jugador.x == 144 && jugador.y == 176) {
+                jefeCine = 2; cineVel = 2; sfxBoom();
+                crearExp(jugador.x + 8, jugador.y + 24);
+            }
+        } else if (jefeCine == 2) {
+            jugador.y -= cineVel; if (cineVel < 12) cineVel++;
+            if ((cineVel & 1) == 0) crearExp(jugador.x + 8, jugador.y + 26);
+            if (jugador.y < -32) jefeCine = 3;
+        } else if (jefeCine == 3) {
+            PAL_fadeOutAll(25, FALSE);
+            u16 p[64]; memcpy(p, img_altura.palette->data, 32); memcpy(p+16, spr_nave.palette->data, 32); memcpy(p+32, spr_enemigo.palette->data, 32); memcpy(p+48, spr_pwr.palette->data, 32); *(p+15) = RGB24_TO_VDPCOLOR(0xFFFFFF);
+            VDP_drawImageEx(BG_B, &img_altura, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX), 0, 0, FALSE, TRUE);
+            VDP_drawImageEx(BG_B, &img_altura, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX), 32, 0, FALSE, TRUE);
+            faseActual = 1; jugador.x = 144; jugador.y = -36;
+            SPR_setPosition(jugador.spr, jugador.x, jugador.y);
+            SPR_update();
+            PAL_fadeInAll(p, 25, FALSE);
+            jefeCine = 4;
+        } else if (jefeCine == 4) {
+            s16 dist = 176 - jugador.y;
+            if (dist > 0) {
+                s16 paso = (dist > 48) ? 6 : ((dist > 24) ? 4 : ((dist > 10) ? 2 : 1));
+                jugador.y += paso;
+            } else {
+                jugador.y = 176; jefeCine = 0;
+                VDP_setTextPalette(PAL0); VDP_drawText("FASE 2: ALTA ALTITUD", 10, 12);
+                msgFase2Timer = 120;
+                XGM_setLoopNumber(-1); XGM_startPlay(mus_juego);
+            }
+        }
+        SPR_setPosition(jugador.spr, jugador.x, jugador.y);
+        if (escudo > 0) SPR_setPosition(sprEscudo, jugador.x - 4, jugador.y - 4);
+        for (int i = 0; i < MAX_EXP; i++) if (exps[i].activo && --exps[i].vida == 0) { exps[i].activo = FALSE; SPR_setVisibility(exps[i].spr, HIDDEN); }
+    }
+u16 p[64]; memcpy(p, img_altura.palette->data, 32); memcpy(p+16, spr_nave.palette->data, 32); memcpy(p+32, spr_enemigo.palette->data, 32); memcpy(p+48, spr_pwr.palette->data, 32); *(p+15) = RGB24_TO_VDPCOLOR(0xFFFFFF);
+            }

@@ -8,6 +8,7 @@ extern const u8 mus_titulo[1024];
 extern const u8 mus_hangar[1024];
 extern const u8 mus_juego[1024];
 extern const u8 mus_jefe[2048];
+extern const u8 mus_victoria[768];
 extern const SpriteDefinition spr_nave;
 extern const SpriteDefinition spr_nave_r;
 extern const SpriteDefinition spr_nave_a;
