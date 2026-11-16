@@ -273,9 +273,11 @@ int main() {
         if (!jefeAct && !jefeMuriendo && !jefeIntro && !jefeCine) for (int i = 0; i < MAX_ENEMIGOS; i++) if (enemigos[i].activo) {
             enemigos[i].y += (faseActual > 0) ? 3 : 2;
                 if (faseActual > 0) {
-                    enemigos[i].x += (((timer + i * 19) & 64) ? 1 : -1);
-                    if (enemigos[i].x < 16) enemigos[i].x = 16;
-                    if (enemigos[i].x > 272) enemigos[i].x = 272;
+                    static s8 eneDir[32];
+                    if (eneDir[i] == 0) eneDir[i] = (i & 1) ? 1 : -1;
+                    enemigos[i].x += eneDir[i];
+                    if (enemigos[i].x <= 16) { enemigos[i].x = 16; eneDir[i] = 1; }
+                    if (enemigos[i].x >= 272) { enemigos[i].x = 272; eneDir[i] = -1; }
                 }
             if (enemigos[i].y > 224) { enemigos[i].activo = FALSE; SPR_setVisibility(enemigos[i].spr, HIDDEN); }
             else {
