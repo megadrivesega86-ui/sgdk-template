@@ -62,7 +62,7 @@ void cicloJefe10k(s16 px, s16 py) {
         else if (px + 6 < jbX[k] + 6 && px + 26 > jbX[k] && py + 6 < jbY[k] + 10 && py + 26 > jbY[k]) {
             jbAct[k] = 0; SPR_setVisibility(sprJB[k], HIDDEN); sfxBoom();
             if (escudo > 0) { escudo--; if (escudo == 0) SPR_setVisibility(sprEscudo, HIDDEN); }
-            else { nivelArma = 1; if (vidas > 0) vidas--; }
+            else { nivelArma = 1; if (vidas > 0) vidas--; else { abrirContinuar(); } }
             verHUD();
         }
     }
