@@ -218,9 +218,9 @@ int main() {
             scrollY -= velScroll;
             VDP_setVerticalScroll(BG_B, scrollY);
             if (jugador.y > 170 && (despegue % 4 == 0)) { jugador.y--; }
-            SPR_setAnim(jugador.spr, (m & (BUTTON_LEFT | BUTTON_RIGHT)) ? 1 : 0);
+            if (despegue > 0) { m = 0; } SPR_setAnim(jugador.spr, (m & (BUTTON_LEFT | BUTTON_RIGHT)) ? 1 : 0);
         SPR_setHFlip(jugador.spr, (m & BUTTON_RIGHT) ? TRUE : FALSE);
-        SPR_setPosition(jugador.spr, jugador.x, jugador.y);
+        PAL_setColor(31, (timer & 4) ? RGB24_TO_VDPCOLOR(0xFFFFA0) : RGB24_TO_VDPCOLOR(0xFF4800)); SPR_setPosition(jugador.spr, jugador.x, jugador.y);
             if (despegue == 0) { VDP_clearText(13, 12, 14); }
             prevM = m; SPR_update(); SYS_doVBlankProcess(); continue;
         }
@@ -241,7 +241,7 @@ int main() {
         if (!jefeCine && jugador.y < 24) { jugador.y = 24; } if (jugador.y > 184) { jugador.y = 184; }
         SPR_setAnim(jugador.spr, (m & (BUTTON_LEFT | BUTTON_RIGHT)) ? 1 : 0);
         SPR_setHFlip(jugador.spr, (m & BUTTON_RIGHT) ? TRUE : FALSE);
-        SPR_setPosition(jugador.spr, jugador.x, jugador.y);
+        PAL_setColor(31, (timer & 4) ? RGB24_TO_VDPCOLOR(0xFFFFA0) : RGB24_TO_VDPCOLOR(0xFF4800)); SPR_setPosition(jugador.spr, jugador.x, jugador.y);
         if (escudo > 0) { SPR_setPosition(sprEscudo, jugador.x, jugador.y); SPR_setVisibility(sprEscudo, (escudo == 1 && (timer & 2)) ? HIDDEN : VISIBLE); } else { SPR_setVisibility(sprEscudo, HIDDEN); }
         if ((m & BUTTON_B) && !(prevM & BUTTON_B)) { autoFire = !autoFire; verHUD(); }
         prevM = m;
@@ -260,7 +260,7 @@ int main() {
             if (pwr.y > 224) { pwr.activo = FALSE; SPR_setVisibility(pwr.spr, HIDDEN); }
             else {
                 SPR_setPosition(pwr.spr, pwr.x, pwr.y); SPR_setFrame(pwr.spr, tipoPwr * 6 + ((timer >> 2) % 6));
-                if (choca(jugador.x, jugador.y, 32, 32, pwr.x, pwr.y, 24, 24)) {
+                if (vidas > 0 && choca(jugador.x, jugador.y, 32, 32, pwr.x, pwr.y, 24, 24)) {
                     pwr.activo = FALSE; SPR_setVisibility(pwr.spr, HIDDEN); sfxStart();
                     if (tipoPwr == 0) { if (nivelArma == 1) nivelArma = 2; else puntos += 300; }
                     else if (tipoPwr == 1) { if (escudo < 3) escudo = 3; else puntos += 300; }
