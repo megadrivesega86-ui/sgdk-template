@@ -220,7 +220,7 @@ int main() {
             if (jugador.y > 170 && (despegue % 4 == 0)) { jugador.y--; }
             if (despegue > 0) { m = 0; } SPR_setAnim(jugador.spr, (m & (BUTTON_LEFT | BUTTON_RIGHT)) ? 1 : 0);
         SPR_setHFlip(jugador.spr, (m & BUTTON_RIGHT) ? TRUE : FALSE);
-        PAL_setColor(31, (timer & 4) ? RGB24_TO_VDPCOLOR(0xFFFFA0) : RGB24_TO_VDPCOLOR(0xFF4800)); SPR_setPosition(jugador.spr, jugador.x, jugador.y);
+        PAL_setColor(31,(despegue&4)?RGB24_TO_VDPCOLOR(0xE0FFFF):RGB24_TO_VDPCOLOR(0x44CCFF));PAL_setColor(30,(despegue&4)?RGB24_TO_VDPCOLOR(0x0066FF):RGB24_TO_VDPCOLOR(0x000000));PAL_setColor(47,(timer&4)?RGB24_TO_VDPCOLOR(0xFFFFC0):RGB24_TO_VDPCOLOR(0xFF6600));PAL_setColor(46,(timer&4)?RGB24_TO_VDPCOLOR(0xFF3300):RGB24_TO_VDPCOLOR(0x000000)); SPR_setPosition(jugador.spr, jugador.x, jugador.y);
             if (despegue == 0) { VDP_clearText(13, 12, 14); }
             prevM = m; SPR_update(); SYS_doVBlankProcess(); continue;
         }
@@ -241,7 +241,7 @@ int main() {
         if (!jefeCine && jugador.y < 24) { jugador.y = 24; } if (jugador.y > 176) { jugador.y = 176; }
         SPR_setAnim(jugador.spr, (m & (BUTTON_LEFT | BUTTON_RIGHT)) ? 1 : 0);
         SPR_setHFlip(jugador.spr, (m & BUTTON_RIGHT) ? TRUE : FALSE);
-        PAL_setColor(31, (timer & 4) ? RGB24_TO_VDPCOLOR(0xFFFFA0) : RGB24_TO_VDPCOLOR(0xFF4800)); SPR_setPosition(jugador.spr, jugador.x, jugador.y);
+        PAL_setColor(31,(timer&4)?RGB24_TO_VDPCOLOR(0xE0FFFF):RGB24_TO_VDPCOLOR(0x44CCFF));PAL_setColor(30,(timer&4)?RGB24_TO_VDPCOLOR(0x0066FF):RGB24_TO_VDPCOLOR(0x000000));PAL_setColor(47,(timer&4)?RGB24_TO_VDPCOLOR(0xFFFFC0):RGB24_TO_VDPCOLOR(0xFF6600));PAL_setColor(46,(timer&4)?RGB24_TO_VDPCOLOR(0xFF3300):RGB24_TO_VDPCOLOR(0x000000)); SPR_setPosition(jugador.spr, jugador.x, jugador.y);
         if (escudo > 0) { SPR_setPosition(sprEscudo, jugador.x, jugador.y); SPR_setVisibility(sprEscudo, (escudo == 1 && (timer & 2)) ? HIDDEN : VISIBLE); } else { SPR_setVisibility(sprEscudo, HIDDEN); }
         if ((m & BUTTON_B) && !(prevM & BUTTON_B)) { autoFire = !autoFire; verHUD(); }
         prevM = m;
