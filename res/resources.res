@@ -1,10 +1,10 @@
-SPRITE spr_nave "nave.png" 4 4 FAST 255
-SPRITE spr_nave_r "nave_roja.png" 4 4 FAST 255
-SPRITE spr_nave_a "nave_azul.png" 4 4 FAST 255
+SPRITE spr_nave "nave.png" 6 6 FAST 255
+SPRITE spr_nave_r "nave_roja.png" 6 6 FAST 255
+SPRITE spr_nave_a "nave_azul.png" 6 6 FAST 255
 SPRITE spr_enemigo "enemigo.png" 4 4 NONE 0
 SPRITE spr_laser "laser.png" 1 1 NONE 0
 SPRITE spr_pwr "powerup.png" 3 3 NONE 0
-SPRITE spr_escudo "escudo.png" 4 4 NONE 0
+SPRITE spr_escudo "escudo.png" 6 6 NONE 0
 SPRITE spr_exp "explosion.png" 4 4 FAST 3
 IMAGE img_fondo "fondo.png" FAST
 IMAGE img_tierra "tierra.png" FAST

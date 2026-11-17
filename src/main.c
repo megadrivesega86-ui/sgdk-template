@@ -71,14 +71,14 @@ void lanzarBala(s16 bx, s16 by, s16 bvx) {
 
 void disparar() {
     if (naveElegida == 2) {
-        lanzarBala(jugador.x + 4, jugador.y - 4, 0);
-        lanzarBala(jugador.x + 20, jugador.y - 4, 0);
+        lanzarBala(jugador.x + 8, jugador.y - 4, 0);
+        lanzarBala(jugador.x + 32, jugador.y - 4, 0);
     } else {
-        lanzarBala(jugador.x + 12, jugador.y - 6, 0);
+        lanzarBala(jugador.x + 20, jugador.y - 6, 0);
     }
     if (nivelArma >= 2) {
-        lanzarBala(jugador.x + 2, jugador.y, -2);
-        lanzarBala(jugador.x + 22, jugador.y, 2);
+        lanzarBala(jugador.x + 2, jugador.y + 6, -2);
+        lanzarBala(jugador.x + 38, jugador.y + 6, 2);
     }
     sfxLaser();
 }
@@ -146,9 +146,9 @@ void mostrarSeleccion() {
     VDP_drawText("< IZQ/DER >  START:JUGAR", 9, 26);
 }
 
+#include "continuar.h"
 #include "jefe_10k.h"
 #include "enemigos_f3.h"
-#include "continuar.h"
 void empezarPartida() { resetJefe10k();
     puntos = 0; estadoJuego = 2; nivelArma = 1; bajasPwr = 0; escudo = 0;
     vidas = (naveElegida == 1) ? 2 : ((naveElegida == 2) ? 5 : 3);
@@ -237,8 +237,8 @@ int main() {
         u16 recarga = (naveElegida == 1) ? 4 : ((naveElegida == 2) ? 10 : 7);
         if (m & BUTTON_LEFT) { jugador.x -= vel; } if (m & BUTTON_RIGHT) { jugador.x += vel; }
         if (m & BUTTON_UP) { jugador.y -= vel; } if (m & BUTTON_DOWN) { jugador.y += vel; }
-        if (jugador.x < 8) { jugador.x = 8; } if (jugador.x > 280) { jugador.x = 280; }
-        if (!jefeCine && jugador.y < 24) { jugador.y = 24; } if (jugador.y > 184) { jugador.y = 184; }
+        if (jugador.x < 8) { jugador.x = 8; } if (jugador.x > 264) { jugador.x = 264; }
+        if (!jefeCine && jugador.y < 24) { jugador.y = 24; } if (jugador.y > 176) { jugador.y = 176; }
         SPR_setAnim(jugador.spr, (m & (BUTTON_LEFT | BUTTON_RIGHT)) ? 1 : 0);
         SPR_setHFlip(jugador.spr, (m & BUTTON_RIGHT) ? TRUE : FALSE);
         PAL_setColor(31, (timer & 4) ? RGB24_TO_VDPCOLOR(0xFFFFA0) : RGB24_TO_VDPCOLOR(0xFF4800)); SPR_setPosition(jugador.spr, jugador.x, jugador.y);
@@ -260,7 +260,7 @@ int main() {
             if (pwr.y > 224) { pwr.activo = FALSE; SPR_setVisibility(pwr.spr, HIDDEN); }
             else {
                 SPR_setPosition(pwr.spr, pwr.x, pwr.y); SPR_setFrame(pwr.spr, tipoPwr * 6 + ((timer >> 2) % 6));
-                if (vidas > 0 && choca(jugador.x, jugador.y, 32, 32, pwr.x, pwr.y, 24, 24)) {
+                if (vidas > 0 && choca(jugador.x, jugador.y, 48, 48, pwr.x, pwr.y, 24, 24)) {
                     pwr.activo = FALSE; SPR_setVisibility(pwr.spr, HIDDEN); sfxStart();
                     if (tipoPwr == 0) { if (nivelArma == 1) nivelArma = 2; else puntos += 300; }
                     else if (tipoPwr == 1) { if (escudo < 3) escudo = 3; else puntos += 300; }
@@ -303,7 +303,7 @@ int main() {
                     }
                     verHUD(); break;
                 }
-                if (enemigos[i].activo && choca(jugador.x+4, jugador.y+4, 24, 24, enemigos[i].x+4, enemigos[i].y+4, 24, 24)) {
+                if (enemigos[i].activo && choca(jugador.x+10, jugador.y+10, 28, 28, enemigos[i].x+4, enemigos[i].y+4, 24, 24)) {
                     enemigos[i].activo = FALSE; SPR_setVisibility(enemigos[i].spr, HIDDEN);
                     crearExp(enemigos[i].x, enemigos[i].y); sfxBoom();
                     if (escudo > 0) { escudo--; if (escudo == 0) SPR_setVisibility(sprEscudo, HIDDEN); } else { nivelArma = 1; if (vidas > 0) { vidas--; } } verHUD();
