@@ -21,9 +21,9 @@ void abrirContinuar() {
 }
 void abrirGameOver() {
     modoFin = 2; XGM_stopPlay();
-    VDP_clearPlane(BG_A, TRUE); VDP_clearPlane(BG_B, TRUE); SPR_reset(); SPR_update();
+    VDP_clearPlane(BG_A, TRUE); const Image* bgF = (faseActual == 2) ? &img_estrato : ((faseActual == 1) ? &img_altura : &img_tierra); VDP_drawImageEx(BG_B, bgF, TILE_ATTR_FULL(PAL0, 0, 0, 0, TILE_USER_INDEX), 0, 0, 0, 1); VDP_drawImageEx(BG_B, bgF, TILE_ATTR_FULL(PAL0, 0, 0, 0, TILE_USER_INDEX), 32, 0, 0, 1); VDP_clearPlane(BG_B, TRUE); SPR_reset(); SPR_update();
     PAL_setColor(0, RGB24_TO_VDPCOLOR(0x000000)); PAL_setColor(15, RGB24_TO_VDPCOLOR(0xFFFFFF));
-    VDP_setTextPriority(FALSE); VDP_setTextPalette(PAL3); VDP_drawText("G A M E   O V E R", 11, 11);
+    VDP_setTextPriority(FALSE); VDP_setTextPalette(PAL3); VDP_drawText("F I N   D E L   J U E G O", 8, 11);
     VDP_setTextPalette(PAL0); VDP_drawText("PULSA START", 14, 14);
 }
 u8 cicloFinJuego(u16 m, u16 prevM) {
@@ -40,7 +40,7 @@ u8 cicloFinJuego(u16 m, u16 prevM) {
         if (!timerFin) { abrirGameOver(); return 1; }
         if ((m & (BUTTON_START | BUTTON_A | BUTTON_B | BUTTON_C)) && !(prevM & (BUTTON_START | BUTTON_A | BUTTON_B | BUTTON_C))) {
             sfxStart();
-            if (!opFin) { modoFin = 0; vidas = 3; escudo = 2; puntos = 0; ebInvul = 90; VDP_setTextPriority(FALSE); PAL_setColor(0, RGB24_TO_VDPCOLOR(0x000000)); VDP_clearPlane(BG_A, TRUE); VDP_drawImageEx(BG_B, &img_tierra, TILE_ATTR_FULL(PAL0, 0, 0, 0, TILE_USER_INDEX), 0, 0, 0, 1); VDP_drawImageEx(BG_B, &img_tierra, TILE_ATTR_FULL(PAL0, 0, 0, 0, TILE_USER_INDEX), 32, 0, 0, 1); SPR_setVisibility(sprEscudo, VISIBLE); verHUD(); XGM_setLoopNumber(-1); XGM_startPlay(jefeAct ? mus_jefe : mus_juego); }
+            if (!opFin) { modoFin = 0; vidas = 3; escudo = 2; ebInvul = 90; VDP_setTextPriority(FALSE); PAL_setColor(0, RGB24_TO_VDPCOLOR(0x000000)); VDP_clearPlane(BG_A, TRUE); const Image* bgF = (faseActual == 2) ? &img_estrato : ((faseActual == 1) ? &img_altura : &img_tierra); VDP_drawImageEx(BG_B, bgF, TILE_ATTR_FULL(PAL0, 0, 0, 0, TILE_USER_INDEX), 0, 0, 0, 1); VDP_drawImageEx(BG_B, bgF, TILE_ATTR_FULL(PAL0, 0, 0, 0, TILE_USER_INDEX), 32, 0, 0, 1); SPR_setVisibility(sprEscudo, VISIBLE); verHUD(); XGM_setLoopNumber(-1); XGM_startPlay(jefeAct ? mus_jefe : mus_juego); }
             else abrirGameOver();
         }
         return 1;

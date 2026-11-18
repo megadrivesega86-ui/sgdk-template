@@ -22,7 +22,7 @@ void cicloBalasEnemigas() {
                     if (escudo > 0) { escudo--; if (escudo == 0) SPR_setVisibility(sprEscudo, HIDDEN); }
                     else { nivelArma = 1; if (vidas > 0) vidas--; }
                     verHUD();
-                    if (vidas == 0) { VDP_setTextPalette(PAL0); VDP_drawText("G A M E   O V E R", 11, 12); VDP_drawText("PULSA START", 15, 14); }
+                    if (vidas == 0) { VDP_setTextPalette(PAL0); VDP_drawText("F I N   D E L   J U E G O", 8, 12); VDP_drawText("PULSA START", 15, 14); }
                 }
             }
         }

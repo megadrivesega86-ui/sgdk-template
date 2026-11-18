@@ -264,7 +264,7 @@ int main() {
                     pwr.activo = FALSE; SPR_setVisibility(pwr.spr, HIDDEN); sfxStart();
                     if (tipoPwr == 0) { if (nivelArma == 1) nivelArma = 2; else puntos += 300; }
                     else if (tipoPwr == 1) { if (escudo < 3) escudo = 3; else puntos += 300; }
-                    else { if (vidas < 10) vidas++; puntos += 500; }
+                    else { if (vidas < 10) { vidas++; puntos += 500; } else { puntos += 1000; } }
                     verHUD();
                 }
             }

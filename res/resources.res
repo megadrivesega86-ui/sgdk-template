@@ -1,7 +1,7 @@
 SPRITE spr_nave "nave.png" 6 6 FAST 255
 SPRITE spr_nave_r "nave_roja.png" 6 6 FAST 255
 SPRITE spr_nave_a "nave_azul.png" 6 6 FAST 255
-SPRITE spr_enemigo "enemigo.png" 4 4 NONE 0
+SPRITE spr_enemigo "enemigo.png" 6 6 NONE 0
 SPRITE spr_laser "laser.png" 1 1 NONE 0
 SPRITE spr_pwr "powerup.png" 3 3 NONE 0
 SPRITE spr_escudo "escudo.png" 6 6 NONE 0
@@ -38,3 +38,4 @@ SPRITE spr_bala_jefe "bala_jefe.png" 2 2 FAST 3
 
 IMAGE img_estrato "estrato.png" BEST
 SPRITE spr_jefe2 "jefe2.png" 12 8 NONE 0
+SPRITE spr_jefe3 "jefe3.png" 12 8 NONE 0
