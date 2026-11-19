@@ -36,6 +36,7 @@ extern const SpriteDefinition spr_jefe1;
 extern const SpriteDefinition spr_bala_jefe;
 extern const Image img_estrato;
 extern const SpriteDefinition spr_jefe2;
-extern const SpriteDefinition spr_jefe3;
+extern const SpriteDefinition spr_jefe3_izq;
+extern const SpriteDefinition spr_jefe3_der;
 
 #endif // _RES_RESOURCES_H_

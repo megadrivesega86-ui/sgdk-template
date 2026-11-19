@@ -20,7 +20,7 @@ void cicloBalasEnemigas() {
                     ebAct[k] = 0; SPR_setVisibility(sprEB[k], HIDDEN);
                     ebInvul = 45; sfxBoom(); crearExp(jugador.x, jugador.y);
                     if (escudo > 0) { escudo--; if (escudo == 0) SPR_setVisibility(sprEscudo, HIDDEN); }
-                    else { nivelArma = 1; if (vidas > 0) vidas--; }
+                    else { nivelArma = 1; armaEsp = 0; armaEsp = 0; if (vidas > 0) vidas--; }
                     verHUD();
                     if (vidas == 0) { VDP_setTextPalette(PAL0); VDP_drawText("F I N   D E L   J U E G O", 8, 12); VDP_drawText("PULSA START", 15, 14); }
                 }
