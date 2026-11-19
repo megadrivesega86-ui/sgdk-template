@@ -2,6 +2,9 @@
 #define _RES_RESOURCES_H_
 
 extern const u8 sfx_laser[1792];
+extern const u8 sfx_wide[2304];
+extern const u8 sfx_fast[1536];
+extern const u8 sfx_missile[2816];
 extern const u8 sfx_boom[4608];
 extern const u8 sfx_start[5120];
 extern const u8 mus_titulo[1024];

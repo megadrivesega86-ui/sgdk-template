@@ -22,6 +22,9 @@ IMAGE img_s3_top "s3_top.png" FAST
 IMAGE img_s3_mid "s3_mid.png" FAST
 IMAGE img_s3_bot "s3_bot.png" FAST
 WAV sfx_laser "laser.wav" XGM
+WAV sfx_wide "sfx_wide.wav" XGM
+WAV sfx_fast "sfx_fast.wav" XGM
+WAV sfx_missile "sfx_missile.wav" XGM
 WAV sfx_boom "boom.wav" XGM
 WAV sfx_start "start.wav" XGM
 XGM mus_titulo "mus_titulo.vgm"
@@ -38,5 +41,5 @@ SPRITE spr_bala_jefe "bala_jefe.png" 2 2 FAST 3
 
 IMAGE img_estrato "estrato.png" BEST
 SPRITE spr_jefe2 "jefe2.png" 12 8 NONE 0
-SPRITE spr_jefe3_izq "jefe3_izq.png" 8 10 NONE 0
+SPRITE spr_jefe3_izq "jefe3_izq.png" 8 8 NONE 0
 SPRITE spr_jefe3_der "jefe3_der.png" 8 10 NONE 0

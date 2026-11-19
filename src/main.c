@@ -5,6 +5,9 @@
 #define MAX_ENEMIGOS 6
 #define MAX_EXP 4
 #define ID_SFX_LASER 64
+#define ID_SFX_WIDE 65
+#define ID_SFX_FAST 66
+#define ID_SFX_MISSILE 67
 #define ID_SFX_BOOM  65
 #define ID_BGM_TEMA  66
 #define ID_SFX_START 67
@@ -23,10 +26,11 @@ u8 pausado = 0, estadoJuego = 0;
 u8 naveElegida = 0;
 bool autoFire = FALSE;
 u8 armaEsp = 0;
+u8 superTiros = 5;
 s16 scrollY = 0;
 char hud[40];
 
-void sfxLaser() { XGM_startPlayPCM(ID_SFX_LASER, 10, SOUND_PCM_CH2); }
+void sfxLaser() { u8 id = (armaEsp == 3) ? ID_SFX_MISSILE : ((armaEsp == 2) ? ID_SFX_FAST : ((armaEsp == 1) ? ID_SFX_WIDE : ID_SFX_LASER)); XGM_startPlayPCM(id, 10, SOUND_PCM_CH2); }
 void sfxBoom()  { XGM_startPlayPCM(ID_SFX_BOOM, 14, SOUND_PCM_CH3); }
 void sfxStart() { XGM_startPlayPCM(ID_SFX_START, 15, SOUND_PCM_CH4); }
 
@@ -65,7 +69,7 @@ void lanzarBala(s16 bx, s16 by, s16 bvx) {
     for (int i = 0; i < MAX_BALAS; i++) {
         if (!balas[i].activo) {
             balas[i].activo = TRUE; balas[i].x = bx; balas[i].y = by; balas[i].vx = bvx;
-            SPR_setVisibility(balas[i].spr, VISIBLE); SPR_setPalette(balas[i].spr, (armaEsp == 3) ? PAL3 : ((armaEsp == 2) ? PAL0 : ((armaEsp == 1) ? PAL2 : PAL1))); SPR_setPosition(balas[i].spr, bx, by); break;
+            SPR_setVisibility(balas[i].spr, VISIBLE); SPR_setFrame(balas[i].spr, armaEsp); SPR_setPalette(balas[i].spr, (armaEsp == 3) ? PAL3 : ((armaEsp == 2) ? PAL0 : ((armaEsp == 1) ? PAL2 : PAL1))); SPR_setPosition(balas[i].spr, bx, by); break;
         }
     }
 }
@@ -196,6 +200,9 @@ void empezarPartida() { resetJefe10k();
 int main() {
     JOY_init(); SPR_init();
     XGM_setPCM(ID_SFX_LASER, sfx_laser, sizeof(sfx_laser));
+	XGM_setPCM(ID_SFX_WIDE, sfx_wide, sizeof(sfx_wide));
+	XGM_setPCM(ID_SFX_FAST, sfx_fast, sizeof(sfx_fast));
+	XGM_setPCM(ID_SFX_MISSILE, sfx_missile, sizeof(sfx_missile));
     XGM_setPCM(ID_SFX_BOOM, sfx_boom, sizeof(sfx_boom));
     
     XGM_setPCM(ID_SFX_START, sfx_start, sizeof(sfx_start));
@@ -262,9 +269,16 @@ int main() {
         PAL_setColor(31,(timer&4)?RGB24_TO_VDPCOLOR(0xE0FFFF):RGB24_TO_VDPCOLOR(0x44CCFF));PAL_setColor(30,(timer&4)?RGB24_TO_VDPCOLOR(0x0066FF):RGB24_TO_VDPCOLOR(0x000000));PAL_setColor(47,(timer&4)?RGB24_TO_VDPCOLOR(0xFFFFC0):RGB24_TO_VDPCOLOR(0xFF6600));PAL_setColor(46,(timer&4)?RGB24_TO_VDPCOLOR(0xFF3300):RGB24_TO_VDPCOLOR(0x000000)); SPR_setPosition(jugador.spr, jugador.x, jugador.y);
         if (escudo > 0) { SPR_setPosition(sprEscudo, jugador.x, jugador.y); SPR_setVisibility(sprEscudo, (escudo == 1 && (timer & 2)) ? HIDDEN : VISIBLE); } else { SPR_setVisibility(sprEscudo, HIDDEN); }
         if ((m & BUTTON_B) && !(prevM & BUTTON_B)) { autoFire = !autoFire; verHUD(); }
+if ((m & BUTTON_C) && !(prevM & BUTTON_C) && superTiros > 0) {
+    superTiros--; sfxBoom();
+    for (int e = 0; e < MAX_ENEMIGOS; e++) if (enemigos[e].activo) { crearExp(enemigos[e].x, enemigos[e].y); enemigos[e].activo = FALSE; SPR_setVisibility(enemigos[e].spr, HIDDEN); puntos += 100; }
+    for (u8 k = 0; k < 3; k++) { jbAct[k] = 0; if (sprJB[k]) SPR_setVisibility(sprJB[k], HIDDEN); }
+    if (jefeAct) { jefeVida = 0; VDP_clearText(6, 4, 28); jefeAct = 0; jefeMuriendo = 180; autoFire = 0; XGM_stopPlay(); }
+    verHUD();
+}
         prevM = m;
         if (cd > 0) { cd--; }
-        if (((m & (BUTTON_A | BUTTON_C)) || autoFire) && cd == 0) { disparar(); cd = (armaEsp == 2) ? (recarga >> 1) : recarga; }
+        if (((m & BUTTON_A) || autoFire) && cd == 0) { disparar(); cd = (armaEsp == 2) ? (recarga >> 1) : recarga; }
         for (int i = 0; i < MAX_BALAS; i++) if (balas[i].activo) {
             balas[i].y -= (armaEsp == 2) ? 9 : 6;
 			if (armaEsp == 3 && balas[i].vx != 0) {
