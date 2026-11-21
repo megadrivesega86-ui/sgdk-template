@@ -12,10 +12,12 @@ extern const u8 mus_hangar[1024];
 extern const u8 mus_juego[1024];
 extern const u8 mus_jefe[2048];
 extern const u8 mus_victoria[768];
+extern const Image img_titulo_ov;
 extern const SpriteDefinition spr_nave;
 extern const SpriteDefinition spr_nave_r;
 extern const SpriteDefinition spr_nave_a;
-extern const SpriteDefinition spr_enemigo;
+extern const SpriteDefinition spr_enemigo1;
+extern const SpriteDefinition spr_enemigo2;
 extern const SpriteDefinition spr_laser;
 extern const SpriteDefinition spr_pwr;
 extern const SpriteDefinition spr_escudo;
@@ -39,7 +41,6 @@ extern const SpriteDefinition spr_jefe1;
 extern const SpriteDefinition spr_bala_jefe;
 extern const Image img_estrato;
 extern const SpriteDefinition spr_jefe2;
-extern const SpriteDefinition spr_jefe3_izq;
-extern const SpriteDefinition spr_jefe3_der;
+extern const SpriteDefinition spr_jefe3;
 
 #endif // _RES_RESOURCES_H_

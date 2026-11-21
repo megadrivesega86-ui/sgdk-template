@@ -16,7 +16,8 @@ Sprite* sprJefeDer = NULL;
 void resetJefe10k() {
 	if (sprJefeDer) { SPR_releaseSprite(sprJefeDer); sprJefeDer = NULL; }
     VDP_clearText(6, 4, 28); msgFase2Timer = 0; VDP_clearText(10, 12, 20);
-    if (sprJefe) { SPR_releaseSprite(sprJefe); sprJefe = NULL; if (sprJefeDer) { SPR_releaseSprite(sprJefeDer); sprJefeDer = NULL; } }
+    for (int k = 0; k < MAX_ENEMIGOS; k++) { enemigos[k].activo = 0; if (enemigos[k].spr) { SPR_releaseSprite(enemigos[k].spr); enemigos[k].spr = NULL; } }
+	if (sprJefe) { SPR_releaseSprite(sprJefe); sprJefe = NULL; if (sprJefeDer) { SPR_releaseSprite(sprJefeDer); sprJefeDer = NULL; } }
     for (u8 k = 0; k < 3; k++) { jbAct[k] = 0; if (sprJB[k]) SPR_setVisibility(sprJB[k], HIDDEN); }
     jefeAct = 0; jefeMuriendo = 0; jefeIntro = 0; jefeCine = 0; cineVel = 0; jefeVencido = 0; jefeTipo = 0; jefeVida = 0;
 }
@@ -30,14 +31,15 @@ void cicloJefe10k(s16 px, s16 py) {
         VDP_setTextPalette(PAL0); jefeTipo = (jefeVencido == 0) ? 1 : ((jefeVencido == 2) ? 3 : 2); VDP_drawText((jefeTipo == 3) ? "ALERTA: EMPERADOR!" : ((jefeTipo == 2) ? "ALERTA: ACORAZADO!" : "ALERTA: JEFE FINAL!"), 10, 12);
     }
     if (jefeIntro > 0 && --jefeIntro == 0) {
-        jefeAct = 1; jefeVida = (jefeTipo == 3) ? 700 : ((jefeTipo == 2) ? 450 : 300); jefeX = (jefeTipo == 3) ? 96 : 128; jefeY = (jefeTipo == 3) ? -64 : -48; jefeVX = (jefeTipo == 3) ? 3 : ((jefeTipo == 2) ? 3 : 2); jefeTiro = 0; if (jefeTipo == 3 && !sprJefeDer) sprJefeDer = SPR_addSprite(&spr_jefe3_izq, jefeX + 64, jefeY, TILE_ATTR(PAL2, FALSE, FALSE, TRUE));
-        PAL_setPalette(PAL2, (jefeTipo == 3 ? spr_jefe3_izq.palette->data : (jefeTipo == 1 ? spr_jefe1.palette->data : spr_jefe2.palette->data)), CPU); sprJefe = SPR_addSprite((jefeTipo == 3) ? &spr_jefe3_izq : ((jefeTipo == 2) ? &spr_jefe2 : &spr_jefe1), jefeX, jefeY, TILE_ATTR(PAL2, TRUE, FALSE, FALSE)); if (jefeTipo == 3 && !sprJefeDer) sprJefeDer = SPR_addSprite(&spr_jefe3_der, jefeX + 64, jefeY, TILE_ATTR(PAL2, TRUE, FALSE, FALSE));
+        jefeAct = 1; jefeVida = (jefeTipo == 3) ? 700 : ((jefeTipo == 2) ? 450 : 300); jefeX = 112; jefeY = (jefeTipo == 3) ? -64 : -48; jefeVX = (jefeTipo == 3) ? 3 : ((jefeTipo == 2) ? 3 : 2); jefeTiro = 0; if (jefeTipo == 3 && !sprJefeDer) sprJefeDer = SPR_addSprite(&spr_jefe3, jefeX + 64, jefeY, TILE_ATTR(PAL2, FALSE, FALSE, TRUE));
+        PAL_setPalette(PAL2, (jefeTipo == 3 ? spr_jefe3.palette->data : (jefeTipo == 1 ? spr_jefe1.palette->data : spr_jefe2.palette->data)), CPU); sprJefe = SPR_addSprite((jefeTipo == 3) ? &spr_jefe3 : ((jefeTipo == 2) ? &spr_jefe2 : &spr_jefe1), jefeX, jefeY, TILE_ATTR(PAL2, TRUE, FALSE, FALSE)); 
         PAL_getPalette(PAL2, palNave); XGM_setLoopNumber(-1); XGM_startPlay(mus_jefe); verBarraJefe();
     }
     if (jefeAct) {
         if (jefeY < 36) { jefeY++; if (jefeY == 36) VDP_clearText(10, 12, 20); }
         else { jefeX += jefeVX; if (jefeX < 16 || jefeX > 208) jefeVX = -jefeVX; }
-        SPR_setPosition(sprJefe, jefeX, jefeY); if (sprJefeDer) SPR_setPosition(sprJefeDer, jefeX + 64, jefeY); if (sprJefeDer) SPR_setPosition(sprJefeDer, jefeX + 64, jefeY);
+        SPR_setPosition(sprJefe, jefeX, jefeY); if (!sprJefeDer && sprJefe) sprJefeDer = SPR_addSprite((jefeTipo == 3) ? &spr_jefe3 : ((jefeTipo == 2) ? &spr_jefe2 : &spr_jefe1), jefeX + 48, jefeY, TILE_ATTR(PAL2, TRUE, FALSE, TRUE));
+	if (sprJefeDer) SPR_setPosition(sprJefeDer, jefeX + 48, jefeY);
         if (++jefeTiro >= 40 && jefeY >= 36) {
             jefeTiro = 0;
             for (u8 k = 0; k < 3; k++) if (!jbAct[k]) {
@@ -106,7 +108,7 @@ void cicloJefe10k(s16 px, s16 py) {
             if (jugador.y < -32) jefeCine = 3;
         } else if (jefeCine == 3) {
             PAL_getPalette(PAL1, palNave); PAL_getPalette(PAL1, palNave); PAL_getPalette(PAL1, palNave); PAL_fadeOutAll(25, FALSE);
-            u16 p[64]; memcpy(p, img_altura.palette->data, 32); memcpy(p+16, palNave, 32); memcpy(p+32, spr_enemigo.palette->data, 32); memcpy(p+48, spr_pwr.palette->data, 32); *(p+15) = RGB24_TO_VDPCOLOR(0xFFFFFF);
+            u16 p[64]; memcpy(p, img_altura.palette->data, 32); memcpy(p+16, palNave, 32); memcpy(p+32, spr_enemigo1.palette->data, 32); memcpy(p+48, spr_pwr.palette->data, 32); *(p+15) = RGB24_TO_VDPCOLOR(0xFFFFFF);
             VDP_drawImageEx(BG_B, (jefeVencido == 2) ? &img_estrato : &img_altura, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX), 0, 0, FALSE, TRUE);
             VDP_drawImageEx(BG_B, (jefeVencido == 2) ? &img_estrato : &img_altura, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX), 32, 0, FALSE, TRUE);
             faseActual = (jefeVencido == 2) ? 2 : 1; jugador.x = 144; jugador.y = -36;
@@ -130,5 +132,5 @@ void cicloJefe10k(s16 px, s16 py) {
         if (escudo > 0) SPR_setPosition(sprEscudo, jugador.x - 4, jugador.y - 4);
         for (int i = 0; i < MAX_EXP; i++) if (exps[i].activo && --exps[i].vida == 0) { exps[i].activo = FALSE; SPR_setVisibility(exps[i].spr, HIDDEN); }
     }
-u16 p[64]; memcpy(p, img_altura.palette->data, 32); memcpy(p+16, palNave, 32); memcpy(p+32, spr_enemigo.palette->data, 32); memcpy(p+48, spr_pwr.palette->data, 32); *(p+15) = RGB24_TO_VDPCOLOR(0xFFFFFF);
+u16 p[64]; memcpy(p, img_altura.palette->data, 32); memcpy(p+16, palNave, 32); memcpy(p+32, spr_enemigo1.palette->data, 32); memcpy(p+48, spr_pwr.palette->data, 32); *(p+15) = RGB24_TO_VDPCOLOR(0xFFFFFF);
             }
