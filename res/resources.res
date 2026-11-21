@@ -44,3 +44,7 @@ SPRITE spr_bala_jefe "bala_jefe.png" 2 2 FAST 3
 IMAGE img_estrato "estrato.png" BEST
 SPRITE spr_jefe2 "jefe2.png" 6 8 NONE 0
 SPRITE spr_jefe3 "jefe3.png" 6 8 NONE 0
+
+IMAGE img_ftop "ftop.png" FAST
+IMAGE img_fmid "fmid.png" FAST
+IMAGE img_fbot "fbot.png" FAST
