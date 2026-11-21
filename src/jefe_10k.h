@@ -1,3 +1,4 @@
+#include "final_juego.h"
 u8 jefeTipo = 0;
 s16 jbVX[3];
 Sprite *sprJefe = NULL, *sprJB[3] = {NULL, NULL};
@@ -77,17 +78,8 @@ void cicloJefe10k(s16 px, s16 py) {
         if ((jefeMuriendo % 10) == 0) { if (jefeMuriendo >= 30 && (jefeMuriendo % 30) == 0) sfxBoom(); crearExp(jefeX + (random() & 31) + 8, jefeY + (random() & 31)); }
         if (jefeMuriendo == 0) {
             SPR_releaseSprite(sprJefe); sprJefe = NULL; if (sprJefeDer) { SPR_releaseSprite(sprJefeDer); sprJefeDer = NULL; }
-				if (jefeTipo == 3) {
-					puntos += 10000; verHUD();
-					XGM_setLoopNumber(-1); XGM_startPlay(mus_victoria);
-					VDP_setTextPalette(PAL0);
-					VDP_drawText("M I S I O N   C U M P L I D A", 5, 10);
-					VDP_drawText("HAS SALVADO LA GALAXIA", 9, 13);
-					VDP_drawText("PULSA START PARA REINICIAR", 7, 17);
-					while (!(JOY_readJoypad(JOY_1) & BUTTON_START)) { SPR_update(); SYS_doVBlankProcess(); }
-					SYS_hardReset();
-				}
-				jefeVencido = (jefeTipo == 2) ? 2 : 1;
+				
+				jefeVencido = (jefeTipo == 3) ? 3 : ((jefeTipo == 2) ? 2 : 1);
             puntos += 5000; verHUD();
             XGM_setLoopNumber(-1); XGM_startPlay(mus_victoria);
             jefeCine = 1; cineVel = 0;
@@ -109,14 +101,16 @@ void cicloJefe10k(s16 px, s16 py) {
         } else if (jefeCine == 3) {
             PAL_getPalette(PAL1, palNave); PAL_getPalette(PAL1, palNave); PAL_getPalette(PAL1, palNave); PAL_fadeOutAll(25, FALSE);
             u16 p[64]; memcpy(p, img_altura.palette->data, 32); memcpy(p+16, palNave, 32); memcpy(p+32, spr_enemigo1.palette->data, 32); memcpy(p+48, spr_pwr.palette->data, 32); *(p+15) = RGB24_TO_VDPCOLOR(0xFFFFFF);
-            VDP_drawImageEx(BG_B, (jefeVencido == 2) ? &img_estrato : &img_altura, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX), 0, 0, FALSE, TRUE);
-            VDP_drawImageEx(BG_B, (jefeVencido == 2) ? &img_estrato : &img_altura, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX), 32, 0, FALSE, TRUE);
+            if (jefeVencido == 3) { mostrarPantallaFinal(puntos, vidas, 0); jefeCine = 5; jefeCineTimer = 0; } else { VDP_drawImageEx(BG_B, (jefeVencido == 2) ? &img_estrato : &img_altura, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX), 0, 0, FALSE, TRUE);
+            if (jefeVencido == 3) { mostrarPantallaFinal(puntos, vidas, 0); jefeCine = 5; jefeCineTimer = 0; } else { VDP_drawImageEx(BG_B, (jefeVencido == 2) ? &img_estrato : &img_altura, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX), 32, 0, FALSE, TRUE);
             faseActual = (jefeVencido == 2) ? 2 : 1; jugador.x = 144; jugador.y = -36;
             SPR_setPosition(jugador.spr, jugador.x, jugador.y);
             SPR_update();
             PAL_fadeInAll(p, 25, FALSE);
             jefeCine = 4;
-        } else if (jefeCine == 4) {
+			}
+		} } else if (jefeCine == 5) { actualizarCreditosFinal(++jefeCineTimer); if (jefeCineTimer > 960 && (JOY_readJoypad(JOY_1) & BUTTON_START)) { jefeCine = 0; jefeVencido = 0; mostrarTitulo(); XGM_setLoopNumber(-1); XGM_startPlay(mus_titulo); }
+		} else if (jefeCine == 4) {
             s16 dist = 176 - jugador.y;
             if (dist > 0) {
                 s16 paso = (dist > 48) ? 6 : ((dist > 24) ? 4 : ((dist > 10) ? 2 : 1));
