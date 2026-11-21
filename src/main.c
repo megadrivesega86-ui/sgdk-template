@@ -137,9 +137,11 @@ void dibujarBandas(const Image* top, const Image* mid, const Image* bot) {
 }
 
 u16 tituloIntro = 0;
-u8 trucoMataJefes = 0, trucoPaso = 0;
 void sfxTruco() { PSG_setEnvelope(0,0); PSG_setFrequency(0,660); VDP_waitVSync(); VDP_waitVSync(); VDP_waitVSync(); PSG_setFrequency(0,990); VDP_waitVSync(); VDP_waitVSync(); VDP_waitVSync(); VDP_waitVSync(); PSG_setEnvelope(0,15); }
+u8 trucoMataJefes = 0, trucoPaso = 0;
+u16 trucoBtn(u8 i){switch(i){case 0:return BUTTON_UP;case 1:return BUTTON_DOWN;case 2:return BUTTON_LEFT;case 3:return BUTTON_RIGHT;case 4:return BUTTON_A;case 5:return BUTTON_B;default:return BUTTON_C;}}
 void mostrarTitulo() {
+	trucoMataJefes = 0; trucoPaso = 0;
 	trucoMataJefes = 0; trucoPaso = 0;
     estadoJuego = 0; tituloIntro = 0; timer = 0; SPR_reset();
     VDP_setVerticalScroll(BG_B, 0);
@@ -221,14 +223,6 @@ int main() {
     while(1) {
         u16 m = JOY_readJoypad(JOY_1); if (jefeCine > 0) m = 0;
         if (estadoJuego == 0) {
-			if (tituloIntro >= 75) {
-				u16 p = m & ~prevM;
-				const u16 seq = {BUTTON_UP, BUTTON_DOWN, BUTTON_LEFT, BUTTON_RIGHT, BUTTON_A, BUTTON_B, BUTTON_C};
-				if (p & (BUTTON_UP|BUTTON_DOWN|BUTTON_LEFT|BUTTON_RIGHT|BUTTON_A|BUTTON_B|BUTTON_C)) {
-					if (p & seq) { trucoPaso++; if (trucoPaso == 7) { trucoMataJefes = 1; trucoPaso = 0; sfxTruco(); } }
-					else trucoPaso = (p & BUTTON_UP) ? 1 : 0;
-				}
-			}
 			if (tituloIntro < 75) {
 				tituloIntro++;
 				if (tituloIntro == 75) {
@@ -251,7 +245,12 @@ int main() {
                     if (r >= b) { PAL_setColor(48 + k, RGB24_TO_VDPCOLOR(0x040818)); }
                 }
             }
-            if ((m & BUTTON_START) && !(prevM & BUTTON_START)) { timer = 0; sfxStart();  XGM_startPlay(mus_hangar); mostrarSeleccion(); }
+            u16 trg = m & ~prevM;
+			if (trg & (BUTTON_UP|BUTTON_DOWN|BUTTON_LEFT|BUTTON_RIGHT|BUTTON_A|BUTTON_B|BUTTON_C)) {
+				if (trg & trucoBtn(trucoPaso)) { trucoPaso++; if (trucoPaso == 7) { trucoMataJefes = 1; trucoPaso = 0; sfxStart(); } }
+				else trucoPaso = (trg & BUTTON_UP) ? 1 : 0;
+			}
+			if ((m & BUTTON_START) && !(prevM & BUTTON_START)) { timer = 0; sfxStart();  XGM_startPlay(mus_hangar); mostrarSeleccion(); }
         SPR_update(); PAL_setColor(0, 0x0000); VDP_setBackgroundColor(0);
 		SYS_doVBlankProcess(); continue;
         }

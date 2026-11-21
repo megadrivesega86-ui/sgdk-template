@@ -12,7 +12,7 @@ extern const u8 mus_hangar[1024];
 extern const u8 mus_juego[1024];
 extern const u8 mus_jefe[2048];
 extern const u8 mus_victoria[768];
-extern const u8 mus_creditos[7168];
+extern const u8 mus_creditos[19456];
 extern const Image img_titulo_ov;
 extern const SpriteDefinition spr_nave;
 extern const SpriteDefinition spr_nave_r;
