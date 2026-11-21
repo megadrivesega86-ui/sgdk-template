@@ -48,3 +48,5 @@ SPRITE spr_jefe3 "jefe3.png" 6 8 NONE 0
 IMAGE img_ftop "ftop.png" FAST
 IMAGE img_fmid "fmid.png" FAST
 IMAGE img_fbot "fbot.png" FAST
+
+XGM mus_creditos "mus_creditos.vgm" 0

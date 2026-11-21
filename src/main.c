@@ -137,7 +137,10 @@ void dibujarBandas(const Image* top, const Image* mid, const Image* bot) {
 }
 
 u16 tituloIntro = 0;
+u8 trucoMataJefes = 0, trucoPaso = 0;
+void sfxTruco() { PSG_setEnvelope(0,0); PSG_setFrequency(0,660); VDP_waitVSync(); VDP_waitVSync(); VDP_waitVSync(); PSG_setFrequency(0,990); VDP_waitVSync(); VDP_waitVSync(); VDP_waitVSync(); VDP_waitVSync(); PSG_setEnvelope(0,15); }
 void mostrarTitulo() {
+	trucoMataJefes = 0; trucoPaso = 0;
     estadoJuego = 0; tituloIntro = 0; timer = 0; SPR_reset();
     VDP_setVerticalScroll(BG_B, 0);
     PAL_setPalette(PAL0, img_ptop.palette->data, DMA);
@@ -218,6 +221,14 @@ int main() {
     while(1) {
         u16 m = JOY_readJoypad(JOY_1); if (jefeCine > 0) m = 0;
         if (estadoJuego == 0) {
+			if (tituloIntro >= 75) {
+				u16 p = m & ~prevM;
+				const u16 seq = {BUTTON_UP, BUTTON_DOWN, BUTTON_LEFT, BUTTON_RIGHT, BUTTON_A, BUTTON_B, BUTTON_C};
+				if (p & (BUTTON_UP|BUTTON_DOWN|BUTTON_LEFT|BUTTON_RIGHT|BUTTON_A|BUTTON_B|BUTTON_C)) {
+					if (p & seq) { trucoPaso++; if (trucoPaso == 7) { trucoMataJefes = 1; trucoPaso = 0; sfxTruco(); } }
+					else trucoPaso = (p & BUTTON_UP) ? 1 : 0;
+				}
+			}
 			if (tituloIntro < 75) {
 				tituloIntro++;
 				if (tituloIntro == 75) {
@@ -291,7 +302,7 @@ if ((m & BUTTON_C) && !(prevM & BUTTON_C) && superTiros > 0) {
     superTiros--; sfxBoom();
     for (int e = 0; e < MAX_ENEMIGOS; e++) if (enemigos[e].activo) { crearExp(enemigos[e].x, enemigos[e].y); enemigos[e].activo = FALSE; SPR_setVisibility(enemigos[e].spr, HIDDEN); puntos += 100; }
     for (u8 k = 0; k < 3; k++) { jbAct[k] = 0; if (sprJB[k]) SPR_setVisibility(sprJB[k], HIDDEN); }
-    if (jefeAct) { jefeVida = 0; VDP_clearText(6, 4, 28); jefeAct = 0; jefeMuriendo = 180; autoFire = 0; XGM_stopPlay(); }
+    if (jefeAct && trucoMataJefes) { jefeVida = 0; VDP_clearText(6, 4, 28); jefeAct = 0; jefeMuriendo = 180; autoFire = 0; XGM_stopPlay(); }
     verHUD();
 }
         prevM = m;

@@ -3,7 +3,7 @@
 u16 jefeCineTimer = 0;
 void mostrarPantallaFinal(u32 pts, u8 vds, u8 nSel) {
     (void)nSel;
-    SPR_reset(); SPR_update();
+    SPR_reset(); SPR_update(); XGM_setLoopNumber(0); XGM_startPlay(mus_creditos);
     VDP_clearPlane(BG_A, TRUE); VDP_clearPlane(BG_B, TRUE);
     VDP_setHorizontalScroll(BG_B, 0); VDP_setVerticalScroll(BG_B, 0);
     VDP_setHorizontalScroll(BG_A, 0); VDP_setVerticalScroll(BG_A, 0);
