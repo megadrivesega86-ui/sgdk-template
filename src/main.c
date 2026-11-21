@@ -137,7 +137,7 @@ void dibujarBandas(const Image* top, const Image* mid, const Image* bot) {
 }
 
 u16 tituloIntro = 0;
-void sfxTruco() { PSG_setEnvelope(0,0); PSG_setFrequency(0,660); VDP_waitVSync(); VDP_waitVSync(); VDP_waitVSync(); PSG_setFrequency(0,990); VDP_waitVSync(); VDP_waitVSync(); VDP_waitVSync(); VDP_waitVSync(); PSG_setEnvelope(0,15); }
+void sfxTruco() { PSG_setEnvelope(0,0); PSG_setFrequency(0,660); PAL_setColor(0, 0x0000); VDP_waitVSync(); VDP_waitVSync(); VDP_waitVSync(); PSG_setFrequency(0,990); VDP_waitVSync(); VDP_waitVSync(); VDP_waitVSync(); VDP_waitVSync(); PSG_setEnvelope(0,15); }
 u8 trucoMataJefes = 0, trucoPaso = 0;
 u16 trucoBtn(u8 i){switch(i){case 0:return BUTTON_UP;case 1:return BUTTON_DOWN;case 2:return BUTTON_LEFT;case 3:return BUTTON_RIGHT;case 4:return BUTTON_A;case 5:return BUTTON_B;default:return BUTTON_C;}}
 void mostrarTitulo() {
