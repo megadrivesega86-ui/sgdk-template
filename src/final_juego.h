@@ -16,9 +16,13 @@ void mostrarPantallaFinal(u32 pts, u8 vds, u8 nSel) {
 }
 const char* txtCred(u8 i) {
     switch(i) {
-        case 0: return "ETERNAL DREAM"; case 2: return "DISENO Y CODIGO"; case 3: return "MEGADRIVE SEGA 86";
-        case 5: return "ARTE Y GRAFICOS"; case 6: return "EDICION 16 BITS"; case 8: return "MUSICA Y SONIDO";
-        case 9: return "YM2612 + PSG"; case 11: return "GRACIAS POR JUGAR"; case 12: return "FIN";
+        case 0: return "ETERNAL DREAM";
+        case 2: return "CREADOR"; case 3: return "FRANCOIS JEAN SOLES";
+        case 5: return "CREADO CON AYUDA"; case 6: return "DE LA IA DE GOOGLE";
+        case 8: return "DISENO Y CODIGO"; case 9: return "MEGADRIVE SEGA 86";
+        case 11: return "ARTE Y GRAFICOS"; case 12: return "EDICION 16 BITS";
+        case 14: return "MUSICA Y SONIDO"; case 15: return "YM2612 + PSG";
+        case 17: return "GRACIAS POR JUGAR"; case 18: return "FIN";
         default: return 0;
     }
 }
@@ -43,13 +47,13 @@ void actualizarCreditosFinal(u16 t) {
             if (((t - 220) & 15) == 0) {
                 u16 st = (t - 220) / 16;
                 VDP_clearTextArea(1, 0, 19, 28);
-                for (u8 i = 0; i < 13; i++) {
+                for (u8 i = 0; i < 19; i++) {
                     s16 y = 27 + (s16)(i * 2) - (s16)st;
                     const char* s = txtCred(i);
                     if (y >= 2 && y <= 26 && s) VDP_drawText(s, 1, y);
                 }
             }
-        } else if (t > 820) {
+        } else if (t > 1050) {
             if ((t & 31) == 0) VDP_drawText("PULSA START", 1, 17);
             else if ((t & 31) == 16) VDP_clearText(1, 17, 11);
         }
