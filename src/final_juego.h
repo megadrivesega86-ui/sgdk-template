@@ -7,7 +7,7 @@ void mostrarPantallaFinal(u32 pts, u8 vds, u8 nSel) {
     VDP_clearPlane(BG_A, TRUE); VDP_clearPlane(BG_B, TRUE);
     VDP_setHorizontalScroll(BG_B, 0); VDP_setVerticalScroll(BG_B, 0);
     VDP_setHorizontalScroll(BG_A, 0); VDP_setVerticalScroll(BG_A, 0);
-    PAL_setColor(0, 0x0000); PAL_setColor(15, 0x0FFF); PAL_setColor(31, 0x0FFF);
+    VDP_setBackgroundColor(63); PAL_setColor(63, 0x0000); PAL_setColor(0, 0x0000); PAL_setColor(15, 0x0FFF); PAL_setColor(31, 0x0FFF);
     char b[32]; VDP_setTextPalette(PAL0);
     VDP_drawText("MISION CUMPLIDA!", 12, 8);
     VDP_drawText("PILOTO: AS ETERNAL", 11, 11);
@@ -29,7 +29,7 @@ void actualizarCreditosFinal(u16 t) {
         PAL_setPalette(PAL0, img_ftop.palette->data, DMA);
         PAL_setPalette(PAL2, img_fmid.palette->data, DMA);
         PAL_setPalette(PAL3, img_fbot.palette->data, DMA);
-        PAL_setColor(0, 0x0000); PAL_setColor(31, 0x0FFF);
+        VDP_setBackgroundColor(63); PAL_setColor(63, 0x0000); PAL_setColor(0, 0x0000); PAL_setColor(31, 0x0FFF);
     }
     if (t == 220) {
         VDP_clearPlane(BG_A, TRUE); VDP_clearPlane(BG_B, TRUE);

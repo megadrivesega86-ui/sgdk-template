@@ -221,7 +221,7 @@ int main() {
     XGM_startPlay(mus_titulo);
 
     while(1) {
-        u16 m = JOY_readJoypad(JOY_1); if (jefeCine > 0) m = 0;
+        if (estadoJuego == 2) { PAL_setColor(47, (timer & 4) ? 0x06EE : 0x008E); } u16 m = JOY_readJoypad(JOY_1); if (jefeCine > 0) m = 0;
         if (estadoJuego == 0) {
 			if (tituloIntro < 75) {
 				tituloIntro++;
