@@ -364,9 +364,6 @@ if ((m & BUTTON_C) && !(prevM & BUTTON_C) && superTiros > 0) {
                             pwr.x = enemigos[i].x + 8; pwr.y = enemigos[i].y;
                             SPR_setVisibility(pwr.spr, VISIBLE); SPR_setPosition(pwr.spr, pwr.x, pwr.y); SPR_setFrame(pwr.spr, tipoPwr * 6 + ((timer >> 2) % 6));
                         } else { puntos += 500; }
-                    } if (faseActual == 0 && puntos >= 10000) {
-                        faseActual = 1; avisoOrbita = 90; sfxStart();
-                        PAL_setColor(63, 0x00CE); VDP_setTextPalette(PAL3);
                     }
                     verHUD(); break;
                 }
