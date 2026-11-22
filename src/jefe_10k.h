@@ -8,37 +8,14 @@ s16 cineVel = 0;
 u8 jefeAct = 0, jefeMuriendo = 0, jefeVencido = 0, jefeTiro = 0, jbAct[3] = {0, 0};
 
 void verBarraJefe() {
-    static u8 ini = 0;
-    if (!ini) {
-        u32 t[11][8];
-        for (int k = 0; k < 11; k++) for (int y = 0; y < 8; y++) t[k][y] = 0;
-        t[0][0]=0x0EEEEEEE; t[0][1]=0x0E000000; t[0][2]=0x0E0EEEEE; t[0][3]=0x0E0E0000; t[0][4]=0x0E0E0000; t[0][5]=0x0E0EEEEE; t[0][6]=0x0E000000; t[0][7]=0x0EEEEEEE;
-        t[1][0]=0xEEEEEEE0; t[1][1]=0x000000E0; t[1][2]=0xEEEEE0E0; t[1][3]=0x0000E0E0; t[1][4]=0x0000E0E0; t[1][5]=0xEEEEE0E0; t[1][6]=0x000000E0; t[1][7]=0xEEEEEEE0;
-        for (int f = 0; f <= 8; f++) {
-            t[2 + f][0] = 0xEEEEEEEE; t[2 + f][7] = 0xEEEEEEEE;
-            for (int x = 0; x < f; x++) {
-                u32 c = (x >= f - 2) ? 0xF : 0xD;
-                u32 cs = (x >= f - 2) ? 0xF : 0xC;
-                int sh = (7 - x) * 4;
-                t[2 + f][2] |= (c << sh); t[2 + f][3] |= (c << sh); t[2 + f][4] |= (c << sh); t[2 + f][5] |= (cs << sh);
-            }
-        }
-        VDP_loadTileData((const u32*)t, 1360, 11, CPU);
-        ini = 1;
-    }
     PAL_setColor(60, 0x0008); PAL_setColor(61, 0x000E); PAL_setColor(62, 0x0EEE); PAL_setColor(63, 0x00CE);
-    VDP_setTextPalette(PAL3); VDP_drawText("JEFE:", 6, 4);
+    VDP_setTextPalette(PAL3);
     int maxV = (jefeTipo == 3) ? 700 : ((jefeTipo == 2) ? 460 : 300);
-    int px = (jefeVida > 0) ? ((int)jefeVida * 128) / maxV : 0;
-    if (px > 128) px = 128;
-    VDP_setTileMapXY(BG_A, TILE_ATTR_FULL(PAL3, TRUE, FALSE, FALSE, 1360), 11, 4);
-    for (int i = 0; i < 16; i++) {
-        int f = px - i * 8;
-        if (f < 0) f = 0;
-        if (f > 8) f = 8;
-        VDP_setTileMapXY(BG_A, TILE_ATTR_FULL(PAL3, TRUE, FALSE, FALSE, 1404 + f), 12 + i, 4);
-    }
-    VDP_setTileMapXY(BG_A, TILE_ATTR_FULL(PAL3, TRUE, FALSE, FALSE, 1403), 28, 4);
+    int b = (jefeVida > 0) ? ((int)jefeVida * 16) / maxV : 0;
+    if (b > 16) b = 16;
+    char buf[26] = "JEFE: [                ]";
+    for (int i = 0; i < 16; i++) buf[7 + i] = (i < b) ? '=' : ' ';
+    VDP_drawText(buf, 6, 4);
 }
 Sprite* sprJefeDer = NULL;
 void resetJefe10k() {
@@ -77,9 +54,9 @@ void cicloJefe10k(s16 px, s16 py) {
             }
         }
         for (int i = 0; i < MAX_BALAS; i++) if (balas[i].activo) {
-            if (balas[i].x < jefeX + ((jefeTipo == 3) ? 124 : 62) && balas[i].x + 6 > jefeX + 2 && balas[i].y < jefeY + ((jefeTipo == 3) ? 76 : 44) && balas[i].y + 10 > jefeY + 4) {
+            if (balas[i].x < jefeX + ((jefeTipo == 3) ? 124 : 62) && balas[i].x + 6 > jefeX + 2 && balas[i].y < jefeY + ((jefeTipo == 3) ? 48 : 26) && balas[i].y + 10 > jefeY + 4) {
                 balas[i].activo = FALSE; SPR_setVisibility(balas[i].spr, HIDDEN);
-                crearExp(balas[i].x, balas[i].y); sfxBoom();
+                crearExp(balas[i].x, balas[i].y - 8); sfxBoom();
                 jefeVida--; verBarraJefe(); if (jefeVida <= 0) { VDP_clearText(6, 4, 28);
                     jefeAct = 0; jefeMuriendo = 180; autoFire = 0; verHUD(); XGM_stopPlay();
                     for (u8 k = 0; k < 3; k++) { jbAct[k] = 0; if (sprJB[k]) SPR_setVisibility(sprJB[k], HIDDEN); }
@@ -102,7 +79,7 @@ void cicloJefe10k(s16 px, s16 py) {
         jefeMuriendo--;
         if (sprJefeDer) SPR_setPosition(sprJefeDer, jefeX + 64 + ((jefeMuriendo & 2) ? 4 : -4), jefeY + ((jefeMuriendo & 4) ? 2 : -2)); SPR_setPosition(sprJefe, jefeX + ((jefeMuriendo & 2) ? 4 : -4), jefeY + ((jefeMuriendo & 4) ? 2 : -2));
         SPR_setVisibility(sprJefe, (jefeMuriendo & 1) ? VISIBLE : HIDDEN);
-        if ((jefeMuriendo % 10) == 0) { if (jefeMuriendo >= 30 && (jefeMuriendo % 30) == 0) sfxBoom(); crearExp(jefeX + (random() & 31) + 8, jefeY + (random() & 31) - 14); }
+        if ((jefeMuriendo % 10) == 0) { if (jefeMuriendo >= 30 && (jefeMuriendo % 30) == 0) sfxBoom(); crearExp(jefeX + (random() & 31) + 8, jefeY + (random() & 31) - 14 - 14); }
         if (jefeMuriendo == 0) {
             SPR_releaseSprite(sprJefe); sprJefe = NULL; if (sprJefeDer) { SPR_releaseSprite(sprJefeDer); sprJefeDer = NULL; }
 				
