@@ -23,7 +23,7 @@ void verBarraJefe() {
                 t[2 + f][2] |= (c << sh); t[2 + f][3] |= (c << sh); t[2 + f][4] |= (c << sh); t[2 + f][5] |= (cs << sh);
             }
         }
-        VDP_loadTileData((const u32*)t, 1402, 11, CPU);
+        VDP_loadTileData((const u32*)t, 1360, 11, CPU);
         ini = 1;
     }
     PAL_setColor(60, 0x0008); PAL_setColor(61, 0x000E); PAL_setColor(62, 0x0EEE); PAL_setColor(63, 0x00CE);
@@ -31,7 +31,7 @@ void verBarraJefe() {
     int maxV = (jefeTipo == 3) ? 700 : ((jefeTipo == 2) ? 460 : 300);
     int px = (jefeVida > 0) ? ((int)jefeVida * 128) / maxV : 0;
     if (px > 128) px = 128;
-    VDP_setTileMapXY(BG_A, TILE_ATTR_FULL(PAL3, TRUE, FALSE, FALSE, 1402), 11, 4);
+    VDP_setTileMapXY(BG_A, TILE_ATTR_FULL(PAL3, TRUE, FALSE, FALSE, 1360), 11, 4);
     for (int i = 0; i < 16; i++) {
         int f = px - i * 8;
         if (f < 0) f = 0;
@@ -102,7 +102,7 @@ void cicloJefe10k(s16 px, s16 py) {
         jefeMuriendo--;
         if (sprJefeDer) SPR_setPosition(sprJefeDer, jefeX + 64 + ((jefeMuriendo & 2) ? 4 : -4), jefeY + ((jefeMuriendo & 4) ? 2 : -2)); SPR_setPosition(sprJefe, jefeX + ((jefeMuriendo & 2) ? 4 : -4), jefeY + ((jefeMuriendo & 4) ? 2 : -2));
         SPR_setVisibility(sprJefe, (jefeMuriendo & 1) ? VISIBLE : HIDDEN);
-        if ((jefeMuriendo % 10) == 0) { if (jefeMuriendo >= 30 && (jefeMuriendo % 30) == 0) sfxBoom(); crearExp(jefeX + (random() & 31) + 8, jefeY + (random() & 31)); }
+        if ((jefeMuriendo % 10) == 0) { if (jefeMuriendo >= 30 && (jefeMuriendo % 30) == 0) sfxBoom(); crearExp(jefeX + (random() & 31) + 8, jefeY + (random() & 31) - 14); }
         if (jefeMuriendo == 0) {
             SPR_releaseSprite(sprJefe); sprJefe = NULL; if (sprJefeDer) { SPR_releaseSprite(sprJefeDer); sprJefeDer = NULL; }
 				

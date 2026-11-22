@@ -351,7 +351,7 @@ if ((m & BUTTON_C) && !(prevM & BUTTON_C) && superTiros > 0) {
                 for (int b = 0; b < MAX_BALAS; b++) if (balas[b].activo && choca(balas[b].x, balas[b].y, 8, 8, enemigos[i].x+2, enemigos[i].y+2, 28, 28)) {
                     balas[b].activo = FALSE; SPR_setVisibility(balas[b].spr, HIDDEN);
                     enemigos[i].activo = FALSE; SPR_setVisibility(enemigos[i].spr, HIDDEN);
-                    crearExp(enemigos[i].x, enemigos[i].y); sfxBoom(); puntos += (faseActual > 0) ? 150 : 100; if (++bajasPwr >= 12 && !pwr.activo) {
+                    crearExp(enemigos[i].x, enemigos[i].y); sfxBoom(); puntos += (faseActual > 0) ? 150 : 100; if (++bajasPwr >= 15 && !pwr.activo) {
                         bajasPwr = 0;
                         u8 disp[3], nd = 0;
                         if (armaEsp < 3) disp[nd++] = 0;
