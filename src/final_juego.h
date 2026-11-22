@@ -53,7 +53,7 @@ void actualizarCreditosFinal(u16 t) {
                     if (y >= 2 && y <= 26 && s) VDP_drawText(s, 1, y);
                 }
             }
-        } else if (t > 1050) {
+        } else if (t > 1300) {
             if ((t & 31) == 0) VDP_drawText("PULSA START", 1, 17);
             else if ((t & 31) == 16) VDP_clearText(1, 17, 11);
         }
