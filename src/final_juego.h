@@ -43,7 +43,7 @@ void actualizarCreditosFinal(u16 t) {
         VDP_drawImageEx(BG_B, &img_fbot, TILE_ATTR_FULL(PAL3,0,0,0,i), 0, 23, 0, 1);
         VDP_setTextPalette(PAL1);
     } else if (t == 260) { VDP_drawText("ETERNAL DREAM", 1, 2); VDP_drawText("GALAXIA A SALVO", 1, 4); }
-        else if (t > 220 && t <= 820) {
+        else if (t > 220 && t <= 1020) {
             if (((t - 220) & 15) == 0) {
                 u16 st = (t - 220) / 16;
                 VDP_clearTextArea(1, 0, 19, 28);
@@ -53,7 +53,7 @@ void actualizarCreditosFinal(u16 t) {
                     if (y >= 2 && y <= 26 && s) VDP_drawText(s, 1, y);
                 }
             }
-        } else if (t > 1300) {
+        } else if (t > 1040) {
             if ((t & 31) == 0) VDP_drawText("PULSA START", 1, 17);
             else if ((t & 31) == 16) VDP_clearText(1, 17, 11);
         }
