@@ -45,10 +45,16 @@ void cicloJefe10k(s16 px, s16 py) {
         else { jefeX += jefeVX; if (jefeX < 16 || jefeX > 208) jefeVX = -jefeVX; }
         SPR_setPosition(sprJefe, jefeX, jefeY); if (!sprJefeDer && sprJefe) sprJefeDer = SPR_addSprite((jefeTipo == 3) ? &spr_jefe3 : ((jefeTipo == 2) ? &spr_jefe2 : &spr_jefe1), jefeX + 48, jefeY, TILE_ATTR(PAL2, TRUE, FALSE, TRUE));
 	if (sprJefeDer) SPR_setPosition(sprJefeDer, jefeX + 48, jefeY);
-        if (++jefeTiro >= 40 && jefeY >= 36) {
+        if (jefeTipo == 3 && jefeY >= 36) { jefeY = 36 + ((jefeX >> 3) & 15); SPR_setPosition(sprJefe, jefeX, jefeY); if (sprJefeDer) SPR_setPosition(sprJefeDer, jefeX + 48, jefeY); }
+        u8 cad = (jefeTipo == 2) ? 26 : ((jefeTipo == 3) ? 32 : 42);
+        if (++jefeTiro >= cad && jefeY >= 36) {
             jefeTiro = 0;
             for (u8 k = 0; k < 3; k++) if (!jbAct[k]) {
-                jbAct[k] = 1; jbX[k] = jefeX + (k ? 46 : 14); jbY[k] = jefeY + 42;
+                jbAct[k] = 1;
+                if (jefeTipo == 1) { jbX[k] = jefeX + 16 + k * 16; jbVX[k] = (s8)k - 1; }
+                else if (jefeTipo == 2) { jbX[k] = jefeX + 30; jbVX[k] = (px > jbX[k] + 16) ? 2 : ((px < jbX[k] - 16) ? -2 : 0); }
+                else { jbX[k] = jefeX + 18 + k * 38; jbVX[k] = (s8)k - 1; }
+                jbY[k] = jefeY + 36;
                 if (!sprJB[k]) sprJB[k] = SPR_addSprite(&spr_bala_jefe, jbX[k] - 4, jbY[k], TILE_ATTR(PAL3, TRUE, FALSE, FALSE));
                 else { SPR_setVisibility(sprJB[k], VISIBLE); SPR_setPosition(sprJB[k], jbX[k], jbY[k]); }
             }
