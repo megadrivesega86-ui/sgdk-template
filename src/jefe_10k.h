@@ -8,10 +8,37 @@ s16 cineVel = 0;
 u8 jefeAct = 0, jefeMuriendo = 0, jefeVencido = 0, jefeTiro = 0, jbAct[3] = {0, 0};
 
 void verBarraJefe() {
-    char b[28]; int n = (jefeVida > 0) ? (jefeTipo == 3) ? ((jefeVida + 34) / 35) : ((jefeTipo == 2) ? ((jefeVida + 22) / 23) : ((jefeVida + 14) / 15)) : 0;
-    strcpy(b, "BOSS [....................]");
-    for (int i = 0; i < n && i < 20; i++) b[6 + i] = 35;
-    PAL_setColor(63, RGB24_TO_VDPCOLOR(0xFFCC00)); VDP_setTextPalette(PAL3); VDP_drawText(b, 6, 4); VDP_setTextPalette(PAL0);
+    static u8 ini = 0;
+    if (!ini) {
+        u32 t[11][8];
+        for (int k = 0; k < 11; k++) for (int y = 0; y < 8; y++) t[k][y] = 0;
+        t[0][0]=0x0EEEEEEE; t[0][1]=0x0E000000; t[0][2]=0x0E0EEEEE; t[0][3]=0x0E0E0000; t[0][4]=0x0E0E0000; t[0][5]=0x0E0EEEEE; t[0][6]=0x0E000000; t[0][7]=0x0EEEEEEE;
+        t[1][0]=0xEEEEEEE0; t[1][1]=0x000000E0; t[1][2]=0xEEEEE0E0; t[1][3]=0x0000E0E0; t[1][4]=0x0000E0E0; t[1][5]=0xEEEEE0E0; t[1][6]=0x000000E0; t[1][7]=0xEEEEEEE0;
+        for (int f = 0; f <= 8; f++) {
+            t[2 + f][0] = 0xEEEEEEEE; t[2 + f][7] = 0xEEEEEEEE;
+            for (int x = 0; x < f; x++) {
+                u32 c = (x >= f - 2) ? 0xF : 0xD;
+                u32 cs = (x >= f - 2) ? 0xF : 0xC;
+                int sh = (7 - x) * 4;
+                t[2 + f][2] |= (c << sh); t[2 + f][3] |= (c << sh); t[2 + f][4] |= (c << sh); t[2 + f][5] |= (cs << sh);
+            }
+        }
+        VDP_loadTileData((const u32*)t, 1402, 11, CPU);
+        ini = 1;
+    }
+    PAL_setColor(60, 0x0008); PAL_setColor(61, 0x000E); PAL_setColor(62, 0x0EEE); PAL_setColor(63, 0x00CE);
+    VDP_setTextPalette(PAL3); VDP_drawText("JEFE:", 6, 4);
+    int maxV = (jefeTipo == 3) ? 700 : ((jefeTipo == 2) ? 460 : 300);
+    int px = (jefeVida > 0) ? ((int)jefeVida * 128) / maxV : 0;
+    if (px > 128) px = 128;
+    VDP_setTileMapXY(BG_A, TILE_ATTR_FULL(PAL3, TRUE, FALSE, FALSE, 1402), 11, 4);
+    for (int i = 0; i < 16; i++) {
+        int f = px - i * 8;
+        if (f < 0) f = 0;
+        if (f > 8) f = 8;
+        VDP_setTileMapXY(BG_A, TILE_ATTR_FULL(PAL3, TRUE, FALSE, FALSE, 1404 + f), 12 + i, 4);
+    }
+    VDP_setTileMapXY(BG_A, TILE_ATTR_FULL(PAL3, TRUE, FALSE, FALSE, 1403), 28, 4);
 }
 Sprite* sprJefeDer = NULL;
 void resetJefe10k() {

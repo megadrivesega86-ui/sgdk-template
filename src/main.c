@@ -44,16 +44,15 @@ void verHUD() {
     char h1[42], h2[42], h3[42];
     const char* nom[3] = {"DREAMER", "RAVEN-X", "COLOSSUS"};
     PAL_setColor(31, RGB24_TO_VDPCOLOR(0xFFCC00));
-    VDP_setTextPalette(PAL3);
-    sprintf(h1, "JUGADOR 1     SCORE     STAGE %d", faseActual + 1);
-    VDP_drawText(h1, 1, 1);
-    VDP_setTextPalette(PAL0);
+    PAL_setColor(63, 0x00CE); VDP_setTextPalette(PAL3);
+    VDP_drawText("JUGADOR 1     PUNTOS    FASE", 1, 1); PAL_setColor(15, 0x0EEE); VDP_setTextPalette(PAL0); sprintf(h1, "%d ", faseActual + 1); VDP_drawText(h1, 30, 1);
+    PAL_setColor(63, 0x00CE); VDP_setTextPalette(PAL3);
     sprintf(h2, "%-8s      %06lu          ", nom[naveElegida], puntos);
-    VDP_drawText(h2, 1, 2);
-    sprintf(h3, "  x%-2d              %4s %7s", vidas,
+    PAL_setColor(15, 0x0EEE); VDP_setTextPalette(PAL0); VDP_drawText(h2, 1, 2);
+    PAL_setColor(63, 0x00CE); VDP_setTextPalette(PAL3); VDP_drawText("VIDAS", 1, 3); PAL_setColor(15, 0x0EEE); VDP_setTextPalette(PAL0); sprintf(h3, "x%-2d          %4s %7s", vidas,
         (escudo == 3) ? "[S3]" : ((escudo == 2) ? "[S2]" : ((escudo == 1) ? "[S1]" : "    ")),
         (nivelArma > 1) ? (armaEsp == 3) ? "[HOMING]" : ((armaEsp == 2) ? "[LASER] " : ((armaEsp == 1) ? "[WIDE-5]" : "[W-MAX] ")) : (autoFire ? "[A]    " : "       "));
-    VDP_drawText(h3, 1, 3); VDP_setTileMapXY(BG_A, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 1400), 1, 3); VDP_setTileMapXY(BG_A, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 1400), 2, 3);
+    VDP_drawText(h3, 7, 3);
 }
 
 void crearExp(s16 x, s16 y) {
@@ -69,7 +68,7 @@ void lanzarBala(s16 bx, s16 by, s16 bvx) {
     for (int i = 0; i < MAX_BALAS; i++) {
         if (!balas[i].activo) {
             balas[i].activo = TRUE; balas[i].x = bx; balas[i].y = by; balas[i].vx = bvx;
-            SPR_setVisibility(balas[i].spr, VISIBLE); SPR_setFrame(balas[i].spr, armaEsp); SPR_setPalette(balas[i].spr, (armaEsp == 3) ? PAL3 : ((armaEsp == 2) ? PAL0 : ((armaEsp == 1) ? PAL2 : PAL1))); SPR_setPosition(balas[i].spr, bx, by); break;
+            SPR_setVisibility(balas[i].spr, VISIBLE); SPR_setFrame(balas[i].spr, armaEsp); SPR_setPalette(balas[i].spr, (armaEsp == 3) ? PAL3 : ((armaEsp == 2) ? PAL0 : ((armaEsp == 1) ? PAL0 : PAL1))); SPR_setPosition(balas[i].spr, bx, by); break;
         }
     }
 }
@@ -137,7 +136,7 @@ void dibujarBandas(const Image* top, const Image* mid, const Image* bot) {
 }
 
 u16 tituloIntro = 0;
-void sfxTruco() { PSG_setEnvelope(0,0); PSG_setFrequency(0,660); PAL_setColor(0, 0x0000); VDP_waitVSync(); VDP_waitVSync(); VDP_waitVSync(); PSG_setFrequency(0,990); VDP_waitVSync(); VDP_waitVSync(); VDP_waitVSync(); VDP_waitVSync(); PSG_setEnvelope(0,15); }
+void sfxTruco() { PSG_setEnvelope(0,0); PSG_setFrequency(0,660); PAL_setColor(0, 0x0000); if (estadoJuego == 2) PAL_setColor(63, 0x00CE); VDP_waitVSync(); VDP_waitVSync(); VDP_waitVSync(); PSG_setFrequency(0,990); VDP_waitVSync(); VDP_waitVSync(); VDP_waitVSync(); VDP_waitVSync(); PSG_setEnvelope(0,15); }
 u8 trucoMataJefes = 0, trucoPaso = 0;
 u16 trucoBtn(u8 i){switch(i){case 0:return BUTTON_UP;case 1:return BUTTON_DOWN;case 2:return BUTTON_LEFT;case 3:return BUTTON_RIGHT;case 4:return BUTTON_A;case 5:return BUTTON_B;default:return BUTTON_C;}}
 void mostrarTitulo() {
@@ -163,7 +162,7 @@ void mostrarSeleccion() {
     else if (naveElegida == 1) dibujarBandas(&img_s2_top, &img_s2_mid, &img_s2_bot);
     else dibujarBandas(&img_s3_top, &img_s3_mid, &img_s3_bot);
     PAL_setColor(31, RGB24_TO_VDPCOLOR(0xFFFFFF));
-    VDP_setTextPalette(PAL3);
+    PAL_setColor(63, 0x00CE); VDP_setTextPalette(PAL3);
     if (naveElegida == 0) {
         VDP_drawText("SPD: ===--  VIDAS: 3", 9, 23);
         VDP_drawText("ARMA: LASER CENTRAL ", 9, 24);
@@ -196,7 +195,7 @@ void empezarPartida() { resetJefe10k();
     const SpriteDefinition* defNave = (naveElegida == 1) ? &spr_nave_r : ((naveElegida == 2) ? &spr_nave_a : &spr_nave);
     PAL_setPalette(PAL1, defNave->palette->data, DMA);
     jugador.x = 144; jugador.y = 216; despegue = 300;
-    VDP_setTextPalette(PAL0); VDP_drawText("DESPEGANDO...", 13, 12);
+    PAL_setColor(63, 0x00CE); VDP_setTextPalette(PAL3); VDP_drawText("DESPEGANDO...", 13, 12);
     jugador.spr = SPR_addSprite(defNave, jugador.x, jugador.y, TILE_ATTR(PAL1, 0, FALSE, FALSE));
 
     for (int i = 0; i < MAX_BALAS; i++) { balas[i].activo = FALSE; balas[i].spr = SPR_addSprite(&spr_laser, 0, 0, TILE_ATTR(PAL3, 0, FALSE, FALSE)); SPR_setVisibility(balas[i].spr, HIDDEN); }
@@ -235,8 +234,8 @@ int main() {
 				}
 			} else {
             if (++timer >= 50) { timer = 0; }
-            if (timer == 1) { VDP_drawText("PRESS START", 14, 23); }
-            else if (timer == 26) { VDP_clearText(14, 23, 11); }
+            if (timer == 1) { for(u16 k=1;k<img_titulo_ov.palette->length;k++) if(img_titulo_ov.palette->data[k]==0x0EEE) PAL_setColor(16+k, 0x0EEE); VDP_drawText("PRESS START", 14, 23); }
+            else if (timer == 26) { for(u16 k=1;k<img_titulo_ov.palette->length;k++) if(img_titulo_ov.palette->data[k]==0x0EEE) PAL_setColor(16+k, 0x0842); VDP_clearText(14, 23, 11); }
 			}
 			if (0) {
                 for (u16 k = 1; k < 16; k++) {
@@ -279,7 +278,7 @@ int main() {
         }
         if (vidas > 0 && despegue == 0 && !jefeCine && (m & BUTTON_START) && !(prevM & BUTTON_START)) {
             pausado = !pausado; sfxStart();
-            if (pausado) { XGM_pausePlay(); VDP_setTextPalette(PAL0); VDP_drawText("P A U S A", 15, 13); }
+            if (pausado) { XGM_pausePlay(); PAL_setColor(63, 0x00CE); VDP_setTextPalette(PAL3); VDP_drawText("P A U S A", 15, 13); }
             else { VDP_clearText(10, 12, 20); VDP_clearText(10, 13, 20); VDP_clearText(10, 14, 20); XGM_resumePlay(); }
         }
         if (cicloFinJuego(m, prevM)) { prevM = m; SPR_update(); SYS_doVBlankProcess(); continue; }
@@ -367,7 +366,7 @@ if ((m & BUTTON_C) && !(prevM & BUTTON_C) && superTiros > 0) {
                         } else { puntos += 500; }
                     } if (faseActual == 0 && puntos >= 10000) {
                         faseActual = 1; avisoOrbita = 90; sfxStart();
-                        VDP_setTextPalette(PAL0);
+                        PAL_setColor(63, 0x00CE); VDP_setTextPalette(PAL3);
                     }
                     verHUD(); break;
                 }
@@ -376,7 +375,7 @@ if ((m & BUTTON_C) && !(prevM & BUTTON_C) && superTiros > 0) {
                     crearExp(enemigos[i].x, enemigos[i].y); sfxBoom();
                     if (escudo > 0) { escudo--; if (escudo == 0) SPR_setVisibility(sprEscudo, HIDDEN); } else { nivelArma = 1; armaEsp = 0; armaEsp = 0; if (vidas > 0) { vidas--; } } verHUD();
                     if (vidas == 0) {
-                        VDP_setTextPalette(PAL0);
+                        PAL_setColor(63, 0x00CE); VDP_setTextPalette(PAL3);
                         if (vidas == 0 && !modoFin) abrirContinuar();
                     }
                 }
