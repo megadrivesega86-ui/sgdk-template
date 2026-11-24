@@ -27,7 +27,7 @@ void cicloBalasEnemigas() {
             }
         }
     }
-    if (estadoJuego == 2 && faseActual >= 2 && !jefeAct && !jefeCine && vidas > 0 && (timer % 48) == 0) {
+    if (estadoJuego == 2 && (faseActual >= 2 || puntos >= 5000) && !jefeAct && !jefeCine && vidas > 0 && (timer % 48) == 0) {
         for (int i = 0; i < MAX_ENEMIGOS; i++) {
             if (enemigos[i].activo && enemigos[i].y > 16 && enemigos[i].y < 105) {
                 for (int k = 0; k < MAX_EB; k++) {
