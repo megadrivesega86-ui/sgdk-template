@@ -8,7 +8,7 @@ void cicloBalasEnemigas() {
     if (ebInvul > 0) ebInvul--;
     for (int k = 0; k < MAX_EB; k++) {
         if (ebAct[k]) {
-            ebY[k] += 3;
+            ebY[k] += 5;
             if (ebY[k] > 228 || estadoJuego != 2) {
                 ebAct[k] = 0;
                 if (sprEB[k]) SPR_setVisibility(sprEB[k], HIDDEN);
