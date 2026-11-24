@@ -338,7 +338,7 @@ if ((m & BUTTON_C) && !(prevM & BUTTON_C) && superTiros > 0) {
         if (++timer >= 42) { crearEnemigo(); timer = 0; }
         if (!jefeAct && !jefeMuriendo && !jefeIntro && !jefeCine) for (int i = 0; i < MAX_ENEMIGOS; i++) if (enemigos[i].activo) {
             enemigos[i].y += (faseActual > 0) ? 3 : 2;
-                if (faseActual > 0) {
+                if (faseActual > 0 || puntos >= 2000) {
                     static s8 eneDir[32];
                     if (eneDir[i] == 0) eneDir[i] = (i & 1) ? 1 : -1;
                     enemigos[i].x += eneDir[i];
