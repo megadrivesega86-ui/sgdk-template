@@ -119,7 +119,7 @@ void cicloJefe10k(s16 px, s16 py) {
             PAL_fadeInAll(p, 25, FALSE);
             jefeCine = 4;
 			}
-		} } else if (jefeCine == 5) { actualizarCreditosFinal(++jefeCineTimer); if ((jefeCineTimer > 960 && (JOY_readJoypad(JOY_1) & BUTTON_START)) || jefeCineTimer >= 6050) { jefeCine = 0; jefeVencido = 0; mostrarTitulo(); XGM_setLoopNumber(-1); XGM_startPlay(mus_titulo); }
+		} } else if (jefeCine == 5) { actualizarCreditosFinal(++jefeCineTimer); if ((jefeCineTimer > 960 && (JOY_readJoypad(JOY_1) & BUTTON_START)) || jefeCineTimer >= 6050) { jefeCine = 0; jefeVencido = 0; VDP_setVerticalScroll(BG_A, 0); VDP_setVerticalScroll(BG_B, 0); scrollY = 0; mostrarTitulo(); XGM_setLoopNumber(-1); XGM_startPlay(mus_titulo); }
 		} else if (jefeCine == 4) {
             s16 dist = 176 - jugador.y;
             if (dist > 0) {

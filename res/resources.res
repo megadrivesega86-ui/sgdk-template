@@ -49,4 +49,5 @@ IMAGE img_ftop "ftop.png" FAST
 IMAGE img_fmid "fmid.png" FAST
 IMAGE img_fbot "fbot.png" FAST
 
-XGM mus_creditos "mus_creditos.vgm" 0
+
+

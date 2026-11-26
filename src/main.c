@@ -178,6 +178,8 @@ void mostrarSeleccion() {
 
 #include "continuar.h"
 #include "jefe_10k.h"
+#include "stage_select.h"
+#include "stage_select.h"
 #include "enemigos_f3.h"
 void empezarPartida() { resetJefe10k();
     puntos = 0; estadoJuego = 2; nivelArma = 1; armaEsp = 0; armaEsp = 0; bajasPwr = 0; escudo = 0;
