@@ -51,3 +51,4 @@ IMAGE img_fbot "fbot.png" FAST
 
 
 
+XGM mus_creditos "mus_creditos.vgm" 0

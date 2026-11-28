@@ -83,7 +83,7 @@ void cicloJefe10k(s16 px, s16 py) {
     }
     if (jefeMuriendo > 0) {
         jefeMuriendo--;
-        if (sprJefeDer) SPR_setPosition(sprJefeDer, jefeX + 64 + ((jefeMuriendo & 2) ? 4 : -4), jefeY + ((jefeMuriendo & 4) ? 2 : -2)); SPR_setPosition(sprJefe, jefeX + ((jefeMuriendo & 2) ? 4 : -4), jefeY + ((jefeMuriendo & 4) ? 2 : -2));
+        { if (sprJefeDer) SPR_setPosition(sprJefeDer, jefeX + 64 + ((jefeMuriendo & 2) ? 4 : -4), jefeY + ((jefeMuriendo & 4) ? 2 : -2)); SPR_setPosition(sprJefe, jefeX + ((jefeMuriendo & 2) ? 4 : -4), jefeY + ((jefeMuriendo & 4) ? 2 : -2)); }
         SPR_setVisibility(sprJefe, (jefeMuriendo & 1) ? VISIBLE : HIDDEN);
         if ((jefeMuriendo % 10) == 0) { if (jefeMuriendo >= 30 && (jefeMuriendo % 30) == 0) sfxBoom(); crearExp(jefeX + (random() & 31) + 8, jefeY + (random() & 31) - 14 - 14); }
         if (jefeMuriendo == 0) {

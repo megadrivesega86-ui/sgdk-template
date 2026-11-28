@@ -1,4 +1,7 @@
+
+#include "stage_select.h"
 #include <genesis.h>
+static u8 fsTmp = 0;
 #include "resources.h"
 
 #define MAX_BALAS 16
@@ -43,7 +46,7 @@ void verHUD() {
     }
     char h1[42], h2[42], h3[42];
     const char* nom[3] = {"DREAMER", "RAVEN-X", "COLOSSUS"};
-    PAL_setColor(31, RGB24_TO_VDPCOLOR(0xFFCC00));
+        extern u8 jefeCine; if (jefeCine != 5) { PAL_setColor(31, RGB24_TO_VDPCOLOR(0xFFCC00)); }
     PAL_setColor(63, 0x00CE); VDP_setTextPalette(PAL3);
     VDP_drawText("JUGADOR 1     PUNTOS    FASE", 1, 1); PAL_setColor(15, 0x0EEE); VDP_setTextPalette(PAL0); sprintf(h1, "%d ", faseActual + 1); VDP_drawText(h1, 30, 1);
     PAL_setColor(63, 0x00CE); VDP_setTextPalette(PAL3);
@@ -161,7 +164,7 @@ void mostrarSeleccion() {
     if (naveElegida == 0) dibujarBandas(&img_s1_top, &img_s1_mid, &img_s1_bot);
     else if (naveElegida == 1) dibujarBandas(&img_s2_top, &img_s2_mid, &img_s2_bot);
     else dibujarBandas(&img_s3_top, &img_s3_mid, &img_s3_bot);
-    PAL_setColor(31, RGB24_TO_VDPCOLOR(0xFFFFFF));
+        extern u8 jefeCine; if (jefeCine != 5) { PAL_setColor(31, RGB24_TO_VDPCOLOR(0xFFFFFF)); }
     PAL_setColor(63, 0x00CE); VDP_setTextPalette(PAL3);
     if (naveElegida == 0) {
         VDP_drawText("SPD: ===--  VIDAS: 3", 9, 23);
@@ -178,8 +181,6 @@ void mostrarSeleccion() {
 
 #include "continuar.h"
 #include "jefe_10k.h"
-#include "stage_select.h"
-#include "stage_select.h"
 #include "enemigos_f3.h"
 void empezarPartida() { resetJefe10k();
     puntos = 0; estadoJuego = 2; nivelArma = 1; armaEsp = 0; armaEsp = 0; bajasPwr = 0; escudo = 0;
@@ -251,14 +252,14 @@ int main() {
 				if (trg & trucoBtn(trucoPaso)) { trucoPaso++; if (trucoPaso == 7) { trucoMataJefes = 1; trucoPaso = 0; sfxStart(); } }
 				else trucoPaso = (trg & BUTTON_UP) ? 1 : 0;
 			}
-			if ((m & BUTTON_START) && !(prevM & BUTTON_START)) { timer = 0; sfxStart();  XGM_startPlay(mus_hangar); mostrarSeleccion(); }
+			if ((m & BUTTON_START) && !(prevM & BUTTON_START)) { timer = 0; sfxStart();  XGM_startPlay(mus_hangar); fsTmp = elegirFaseTemporal(); mostrarSeleccion(); }
         SPR_update(); PAL_setColor(0, 0x0000); VDP_setBackgroundColor(0);
 		SYS_doVBlankProcess(); continue;
         }
         if (estadoJuego == 1) {
             if ((m & BUTTON_LEFT) && !(prevM & BUTTON_LEFT)) { naveElegida = (naveElegida == 0) ? 2 : naveElegida - 1; sfxLaser(); mostrarSeleccion(); }
             if ((m & BUTTON_RIGHT) && !(prevM & BUTTON_RIGHT)) { naveElegida = (naveElegida + 1) % 3; sfxLaser(); mostrarSeleccion(); }
-            if ((m & (BUTTON_START | BUTTON_A | BUTTON_C)) && !(prevM & (BUTTON_START | BUTTON_A | BUTTON_C))) { sfxStart(); XGM_startPlay(mus_juego); empezarPartida(); }
+            if ((m & (BUTTON_START | BUTTON_A | BUTTON_C)) && !(prevM & (BUTTON_START | BUTTON_A | BUTTON_C))) { sfxStart(); XGM_startPlay(mus_juego); if(fsTmp==6){ extern u8 jefeCine; extern u16 jefeCineTimer; estadoJuego=2; SPR_reset(); VDP_clearPlane(BG_A,1); VDP_clearPlane(BG_B,1); jefeCine=5; jefeCineTimer=219; } else { empezarPartida(); if(fsTmp==1){puntos=15000;verHUD();}else if(fsTmp==2){faseActual=1;jefeVencido=1;puntos=20000;verHUD();}else if(fsTmp==3){faseActual=1;jefeVencido=1;puntos=35000;verHUD();}else if(fsTmp==4){faseActual=2;jefeVencido=2;puntos=40000;verHUD();}else if(fsTmp==5){faseActual=2;jefeVencido=2;puntos=55000;verHUD();} } }
             prevM = m; SPR_update(); SYS_doVBlankProcess(); continue;
         }
         if (estadoJuego == 3) {
@@ -274,7 +275,7 @@ int main() {
             if (jugador.y > 170 && (despegue % 4 == 0)) { jugador.y--; }
             if (despegue > 0) { m = 0; } SPR_setAnim(jugador.spr, (m & (BUTTON_LEFT | BUTTON_RIGHT)) ? 1 : 0);
         SPR_setHFlip(jugador.spr, (m & BUTTON_RIGHT) ? TRUE : FALSE);
-        PAL_setColor(31,(despegue&4)?RGB24_TO_VDPCOLOR(0xE0FFFF):RGB24_TO_VDPCOLOR(0x44CCFF));PAL_setColor(30,(despegue&4)?RGB24_TO_VDPCOLOR(0x0066FF):RGB24_TO_VDPCOLOR(0x000000));PAL_setColor(47,(timer&4)?RGB24_TO_VDPCOLOR(0xFFFFC0):RGB24_TO_VDPCOLOR(0xFF6600));PAL_setColor(46,(timer&4)?RGB24_TO_VDPCOLOR(0xFF3300):RGB24_TO_VDPCOLOR(0x000000)); SPR_setPosition(jugador.spr, jugador.x, jugador.y);
+        extern u8 jefeCine; if (jefeCine != 5) { PAL_setColor(31,(despegue&4)?RGB24_TO_VDPCOLOR(0xE0FFFF):RGB24_TO_VDPCOLOR(0x44CCFF));PAL_setColor(30,(despegue&4)?RGB24_TO_VDPCOLOR(0x0066FF):RGB24_TO_VDPCOLOR(0x000000));PAL_setColor(47,(timer&4)?RGB24_TO_VDPCOLOR(0xFFFFC0):RGB24_TO_VDPCOLOR(0xFF6600));PAL_setColor(46,(timer&4)?RGB24_TO_VDPCOLOR(0xFF3300):RGB24_TO_VDPCOLOR(0x000000)); SPR_setPosition(jugador.spr, jugador.x, jugador.y); }
             if (despegue == 0) { VDP_clearText(13, 12, 14); }
             prevM = m; SPR_update(); SYS_doVBlankProcess(); continue;
         }
@@ -295,7 +296,7 @@ int main() {
         if (!jefeCine && jugador.y < 24) { jugador.y = 24; } if (jugador.y > 176) { jugador.y = 176; }
         SPR_setAnim(jugador.spr, (m & (BUTTON_LEFT | BUTTON_RIGHT)) ? 1 : 0);
         SPR_setHFlip(jugador.spr, (m & BUTTON_RIGHT) ? TRUE : FALSE);
-        PAL_setColor(31,(timer&4)?RGB24_TO_VDPCOLOR(0xE0FFFF):RGB24_TO_VDPCOLOR(0x44CCFF));PAL_setColor(30,(timer&4)?RGB24_TO_VDPCOLOR(0x0066FF):RGB24_TO_VDPCOLOR(0x000000));PAL_setColor(47,(timer&4)?RGB24_TO_VDPCOLOR(0xFFFFC0):RGB24_TO_VDPCOLOR(0xFF6600));PAL_setColor(46,(timer&4)?RGB24_TO_VDPCOLOR(0xFF3300):RGB24_TO_VDPCOLOR(0x000000)); SPR_setPosition(jugador.spr, jugador.x, jugador.y);
+        extern u8 jefeCine; if (jefeCine != 5) { PAL_setColor(31,(timer&4)?RGB24_TO_VDPCOLOR(0xE0FFFF):RGB24_TO_VDPCOLOR(0x44CCFF));PAL_setColor(30,(timer&4)?RGB24_TO_VDPCOLOR(0x0066FF):RGB24_TO_VDPCOLOR(0x000000));PAL_setColor(47,(timer&4)?RGB24_TO_VDPCOLOR(0xFFFFC0):RGB24_TO_VDPCOLOR(0xFF6600));PAL_setColor(46,(timer&4)?RGB24_TO_VDPCOLOR(0xFF3300):RGB24_TO_VDPCOLOR(0x000000)); SPR_setPosition(jugador.spr, jugador.x, jugador.y); }
         if (escudo > 0) { SPR_setPosition(sprEscudo, jugador.x, jugador.y); SPR_setVisibility(sprEscudo, (escudo == 1 && (timer & 2)) ? HIDDEN : VISIBLE); } else { SPR_setVisibility(sprEscudo, HIDDEN); }
         if ((m & BUTTON_B) && !(prevM & BUTTON_B)) { autoFire = !autoFire; verHUD(); }
 if ((m & BUTTON_C) && !(prevM & BUTTON_C) && superTiros > 0) {
